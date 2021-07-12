@@ -1,6 +1,8 @@
 from django.db import router
-from api.views import PatientModelViewSet
+from api.views import *
 from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'patients', PatientModelViewSet)
+router.register(r'clinical_control', ClinicalControlViewSet)
+router.register(r'LogWTDparametres', LogWTDparametresViewSet)
