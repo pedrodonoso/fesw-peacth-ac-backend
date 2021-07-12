@@ -75,11 +75,14 @@ WSGI_APPLICATION = 'PeacthAC.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
+# mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/test
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'peacth-ac',
+        'CLIENT':{
+            'host': 'mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/peacth-ac?retryWrites=true&w=majority'
+        }
     }
 }
 

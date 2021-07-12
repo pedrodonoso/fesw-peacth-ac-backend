@@ -4,14 +4,40 @@ from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from api.models import Patient
-from api.serializers import PatientSerializer
+from api.models import *
+from api.serializers import *
+import numpy as np
+
+def calculate_dosis(data):
+        age = data['age']
+        print(age)
+        men = 1 if data['sex'] == 'M' else 0
+        print(men)
+        initialINR = data['initialINR']
+        print(initialINR)
+        imc = data['imc']
+        print(imc)
+        CYP2C9_2_12 = 1 if data['genetics']['CYP2C9_2'] == '*1/*2' else 0
+        print(CYP2C9_2_12)
+        CYP2C9_3_13 = 1 if data['genetics']['CYP2C9_3'] == '*1/*3' else 0
+        print(CYP2C9_3_13)
+        CYP2C9_3_33 = 1 if data['genetics']['CYP2C9_3'] == '*3/*3' else 0
+        print(CYP2C9_3_33)
+        VKORC1_GA = 1 if data['genetics']['VKORC1'] == 'G/A' else 0
+        print(VKORC1_GA)
+        VKORC1_AA = 1 if data['genetics']['VKORC1'] == 'A/A' else 0
+        print(VKORC1_AA)
+
+        logWTD = 3.081 + (0.167 * men) - (age * 0.0081) - (initialINR * 0.55) + (imc * 0.013) - (CYP2C9_2_12 * 0.107) - (CYP2C9_3_13 * 0.323) - (CYP2C9_3_33 * 0.746) - (VKORC1_GA * 0.270) - (VKORC1_AA * 0.701)
+        print(logWTD)
+        return np.exp(logWTD)
 
 # Create your views here.
 class PatientModelViewSet(viewsets.ModelViewSet):
     
     serializer_class = PatientSerializer
     queryset = Patient.objects.all()
+        
 
     @action(detail=True, methods=['post'])
     def get_weekly_dosis(self, request, pk=None):
@@ -25,13 +51,18 @@ class PatientModelViewSet(viewsets.ModelViewSet):
         print(serializer.is_valid())
 
         if serializer.is_valid():
-            serializer.save()
-            imc = request_data["weight"]/(request_data["height"]**2)
-            response = {
-                'imc' : imc
-            }
+            initialDosis = calculate_dosis(request_data)
+            
+            request_data['initialDosis'] = initialDosis
 
-            return Response(response, status=status.HTTP_200_OK)
+            serializer = PatientSerializer(data=request_data)
+            if serializer.is_valid():
+                serializer.save()
+                response = {
+                    'initialDosis' : initialDosis
+                }
+
+                return Response(response, status=status.HTTP_200_OK)
         
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
