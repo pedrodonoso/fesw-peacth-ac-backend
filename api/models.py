@@ -21,15 +21,13 @@ class Diagnosis(models.Model):
     class Meta:
         abstract = isMigrate
 
-    
-
 class Patient(models.Model):
     _id = models.ObjectIdField()
     code = models.CharField(unique=True, max_length=5)
     sex = models.CharField(max_length=1)
     bloodType = models.CharField(max_length=256)
     initialDate = models.CharField(max_length=256)
-    initialDosis = models.IntegerField(default=0)
+    initialDosis = models.FloatField(default=0)
     initialINR = models.FloatField()
     weeklyDosisInRange = models.IntegerField(default=0)
     totalDays = models.IntegerField(default=0)
