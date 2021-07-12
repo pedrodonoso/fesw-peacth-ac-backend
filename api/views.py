@@ -1,3 +1,6 @@
+from PeacthAC.settings import DATABASES
+import re
+from rest_framework import response
 from rest_framework.serializers import Serializer
 from api import serializers
 from django.shortcuts import render
@@ -57,12 +60,72 @@ class PatientModelViewSet(viewsets.ModelViewSet):
 
             serializer = PatientSerializer(data=request_data)
             if serializer.is_valid():
-                serializer.save()
-                response = {
-                    'initialDosis' : initialDosis
+                initial_control = {
+                    'patientCode' : request_data['code'],
+                    'controlDate' : request_data['initialDate'],
+                    'arrivalDose' : 0,
+                    'updatedDose': initialDosis,
+                    'arrivalINR': request_data['initialINR'],
+                    'inrInRange': False
                 }
+                control_serializer = ClinicalControlSerializer(data=initial_control)
+                if control_serializer.is_valid():
+                    control_serializer.save()
+                    serializer.save()
+                    response = {
+                        'initialDosis' : initialDosis
+                    }
 
-                return Response(response, status=status.HTTP_200_OK)
+                    return Response(response, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ClinicalControlViewSet(viewsets.ModelViewSet):   
+
+    serializer_class = ClinicalControlSerializer
+    queryset = ClinicalControl.objects.all()
+
+    @action(detail=True, methods=['post'])
+    def register_visit(self, request, pk=None):
+
+        self.serializer_class = ClinicalControlSerializer
+
+        request_data = request.data
+
+        serializer = ClinicalControlSerializer(data=request_data)
+        patients = Patient.objects.get(code=request_data['patientCode'])
+        print(patients.code)
+
+
+        if serializer.is_valid():
+            serializer.save()
+            response = {
+                'message' : 'Saved Succesfully'
+            }
+            return Response(response, status=status.HTTP_200_OK)
         
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LogWTDparametresViewSet(viewsets.ModelViewSet):
+
+    serializer_class = LogWTDparametresSerializer
+    queryset = LogWTDparametres.objects.all()
+
+    @action(detail=True, methods=['post'])
+    def set_parametres(self, request, pk=None):
+        self.serializer_class = LogWTDparametresSerializer
+
+        request_data = request.data
+
+        serializer = LogWTDparametresSerializer(data=request_data)
+
+        if serializer.is_valid():
+            serializer.save()
+            response = {
+                'message' : 'Parametres updated Succesfully'
+            }
+            return Response(response, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
