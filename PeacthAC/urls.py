@@ -17,8 +17,10 @@ from django import urls
 from django.contrib import admin
 from django.urls import path, include
 from .router import router
+from api.views import DistributionVizualitation
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls))
+    path('api/', include(router.urls)),
+    path('distibutions/', DistributionVizualitation.as_view(),name="distributions")
 ]

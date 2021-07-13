@@ -3,6 +3,7 @@ import re
 from rest_framework import response
 from rest_framework.serializers import Serializer
 from api import serializers
+from rest_framework.decorators import api_view,schema
 from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -10,6 +11,7 @@ from rest_framework.response import Response
 from api.models import *
 from api.serializers import *
 import numpy as np
+from rest_framework.views import APIView
 
 def calculate_dosis(data,params):
     age = data['age']
@@ -134,3 +136,13 @@ class LogWTDparametresViewSet(viewsets.ModelViewSet):
             return Response(response, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DistributionVizualitation(APIView):
+
+    #@api_view(['GET'])
+    #@schema(None)
+    def get(self,request,format=None):
+        genetic = [patient.genetics for patient in Patient.objects.all()]
+        print(genetic)
+
+        return Response({"message": "Will not appear in schema!"})
