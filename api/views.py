@@ -11,7 +11,7 @@ from api.models import *
 from api.serializers import *
 import numpy as np
 
-def calculate_dosis(data):
+def calculate_dosis(data, params):
         age = data['age']
         print(age)
         men = 1 if data['sex'] == 'M' else 0
@@ -34,6 +34,7 @@ def calculate_dosis(data):
         logWTD = 3.081 + (0.167 * men) - (age * 0.0081) - (initialINR * 0.55) + (imc * 0.013) - (CYP2C9_2_12 * 0.107) - (CYP2C9_3_13 * 0.323) - (CYP2C9_3_33 * 0.746) - (VKORC1_GA * 0.270) - (VKORC1_AA * 0.701)
         print(logWTD)
         return np.exp(logWTD)
+
 
 # Create your views here.
 class PatientModelViewSet(viewsets.ModelViewSet):
