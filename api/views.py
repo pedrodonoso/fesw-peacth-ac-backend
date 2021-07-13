@@ -40,6 +40,7 @@ def calculate_dosis(data,params):
         
     return np.exp(logWTD)
 
+
 # Create your views here.
 class PatientModelViewSet(viewsets.ModelViewSet):
     
