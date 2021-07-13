@@ -81,7 +81,11 @@ DATABASES = {
         'ENGINE': 'djongo',
         'NAME': 'peacth-ac',
         #'CLIENT':{
-            #'host': 'mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/peacth-ac?retryWrites=true&w=majority'
+<<<<<<< HEAD
+        #    'host': 'mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/peacth-ac?retryWrites=true&w=majority'
+=======
+         #   'host': 'mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/peacth-ac?retryWrites=true&w=majority'
+>>>>>>> 11197b6f78e6c2f3ee50048766c864eb0a3a5026
         #}
     }
 }

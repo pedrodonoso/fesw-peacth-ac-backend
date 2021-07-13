@@ -3,6 +3,7 @@ import re
 from rest_framework import response
 from rest_framework.serializers import Serializer
 from api import serializers
+from rest_framework.decorators import api_view,schema
 from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -10,30 +11,33 @@ from rest_framework.response import Response
 from api.models import *
 from api.serializers import *
 import numpy as np
+from rest_framework.views import APIView
 
-def calculate_dosis(data):
-        age = data['age']
-        print(age)
-        men = 1 if data['sex'] == 'M' else 0
-        print(men)
-        initialINR = data['initialINR']
-        print(initialINR)
-        imc = data['imc']
-        print(imc)
-        CYP2C9_2_12 = 1 if data['genetics']['CYP2C9_2'] == '*1/*2' else 0
-        print(CYP2C9_2_12)
-        CYP2C9_3_13 = 1 if data['genetics']['CYP2C9_3'] == '*1/*3' else 0
-        print(CYP2C9_3_13)
-        CYP2C9_3_33 = 1 if data['genetics']['CYP2C9_3'] == '*3/*3' else 0
-        print(CYP2C9_3_33)
-        VKORC1_GA = 1 if data['genetics']['VKORC1'] == 'G/A' else 0
-        print(VKORC1_GA)
-        VKORC1_AA = 1 if data['genetics']['VKORC1'] == 'A/A' else 0
-        print(VKORC1_AA)
+def calculate_dosis(data,params):
+    age = data['age']
+    print(age)
+    men = 1 if data['sex'] == 'M' else 0
+    print(men)
+    initialINR = data['initialINR']
+    print(initialINR)
+    imc = data['imc']
+    print(imc)
+    CYP2C9_2_12 = 1 if data['genetics']['CYP2C9_2'] == '*1/*2' else 0
+    print(CYP2C9_2_12)
+    CYP2C9_3_13 = 1 if data['genetics']['CYP2C9_3'] == '*1/*3' else 0
+    print(CYP2C9_3_13)
+    CYP2C9_3_33 = 1 if data['genetics']['CYP2C9_3'] == '*3/*3' else 0
+    print(CYP2C9_3_33)
+    VKORC1_GA = 1 if data['genetics']['VKORC1'] == 'G/A' else 0
+    print(VKORC1_GA)
+    VKORC1_AA = 1 if data['genetics']['VKORC1'] == 'A/A' else 0
+    print(VKORC1_AA)
 
-        logWTD = 3.081 + (0.167 * men) - (age * 0.0081) - (initialINR * 0.55) + (imc * 0.013) - (CYP2C9_2_12 * 0.107) - (CYP2C9_3_13 * 0.323) - (CYP2C9_3_33 * 0.746) - (VKORC1_GA * 0.270) - (VKORC1_AA * 0.701)
-        print(logWTD)
-        return np.exp(logWTD)
+    logWTD = params.p_1 + (params.p_2 * men) - (age * params.p_3) - (initialINR * params.p_4) + (imc * params.p_5) - (CYP2C9_2_12 * params.p_6) - (CYP2C9_3_13 * params.p_7) - (CYP2C9_3_33 * params.p_8) - (VKORC1_GA * params.p_9) - (VKORC1_AA * params.p_10)
+    print(logWTD)
+        
+    return np.exp(logWTD)
+
 
 # Create your views here.
 class PatientModelViewSet(viewsets.ModelViewSet):
@@ -44,6 +48,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def get_weekly_dosis(self, request, pk=None):
+
         self.serializer_class = PatientSerializer
 
         request_data = request.data
@@ -54,7 +59,9 @@ class PatientModelViewSet(viewsets.ModelViewSet):
         print(serializer.is_valid())
 
         if serializer.is_valid():
-            initialDosis = calculate_dosis(request_data)
+            param = LogWTDparametres.objects.last()
+
+            initialDosis = calculate_dosis(request_data, param)
             
             request_data['initialDosis'] = initialDosis
 
@@ -68,6 +75,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
                     'arrivalINR': request_data['initialINR'],
                     'inrInRange': False
                 }
+
                 control_serializer = ClinicalControlSerializer(data=initial_control)
                 if control_serializer.is_valid():
                     control_serializer.save()
@@ -129,3 +137,13 @@ class LogWTDparametresViewSet(viewsets.ModelViewSet):
             return Response(response, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DistributionVizualitation(APIView):
+
+    #@api_view(['GET'])
+    #@schema(None)
+    def get(self,request,format=None):
+        genetic = [patient.genetics for patient in Patient.objects.all()]
+        print(genetic)
+
+        return Response({"message": "Will not appear in schema!"})
