@@ -1,5 +1,4 @@
 from PeacthAC.settings import DATABASES
-import re
 from rest_framework import response
 from rest_framework.serializers import Serializer
 from api import serializers
@@ -12,6 +11,7 @@ from api.models import *
 from api.serializers import *
 import numpy as np
 from rest_framework.views import APIView
+from datetime import date
 
 def calculate_dosis(data,params):
     age = data['age']
@@ -102,11 +102,21 @@ class ClinicalControlViewSet(viewsets.ModelViewSet):
         request_data = request.data
 
         serializer = ClinicalControlSerializer(data=request_data)
-        patients = Patient.objects.get(code=request_data['patientCode'])
-        print(patients.code)
-
+        patient = Patient.objects.get(code=request_data['patientCode'])
+        print(patient.code)
+        
 
         if serializer.is_valid():
+            initialDate = patient.initialDate
+            newDate = request_data['controlDate'].split('-')
+            controlDate = date(int(newDate[0]),int(newDate[1]),int(newDate[2]))
+            delta = controlDate - initialDate
+            patient.totalDays = delta.days
+            print(delta.days)
+            print(patient.totalDays)
+            if request_data['inrInRange']:
+                patient.weeklyDosisInRange = request_data['arrivalDose']
+            patient.save()
             serializer.save()
             response = {
                 'message' : 'Saved Succesfully'
@@ -146,4 +156,4 @@ class DistributionVizualitation(APIView):
         genetic = [patient.genetics for patient in Patient.objects.all()]
         print(genetic)
 
-        return Response({"message": "Will not appear in schema!"})
+        return Response(genetic)

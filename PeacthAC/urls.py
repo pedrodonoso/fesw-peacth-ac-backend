@@ -22,5 +22,5 @@ from api.views import DistributionVizualitation
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('distibutions/', DistributionVizualitation.as_view(),name="distributions")
+    path('api/distributions/', DistributionVizualitation.as_view(), name="distributions")
 ]

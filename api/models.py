@@ -31,7 +31,7 @@ class Patient(models.Model):
     initialDate = models.DateField(default=datetime.date.today)
     initialDosis = models.FloatField(default=0)
     initialINR = models.FloatField()
-    weeklyDosisInRange = models.IntegerField(default=0)
+    weeklyDosisInRange = models.FloatField(default=0)
     totalDays = models.IntegerField(default=0)
     weight = models.IntegerField()
     height = models.FloatField()
@@ -50,7 +50,7 @@ class Patient(models.Model):
 
 class ClinicalControl(models.Model):
     _id = models.ObjectIdField()
-    patientCode = models.CharField(unique=True, max_length=5)
+    patientCode = models.CharField(max_length=5)
     controlDate = models.DateField(default=datetime.date.today)
     arrivalDose = models.FloatField(default=0)
     updatedDose = models.FloatField(default=0)
