@@ -10,6 +10,8 @@ from rest_framework.response import Response
 from api.models import *
 from api.serializers import *
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 from rest_framework.views import APIView
 from datetime import date
 
@@ -148,12 +150,26 @@ class LogWTDparametresViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+def make_data_frame(genetic, users, dosis):
+    df_g = pd.DataFrame(genetic)
+    df_u = pd.DataFrame(users)
+    df_d = pd.DataFrame(dosis, columns = ['dosis'])
+
+    genetics = pd.concat([df_u, df_d, df_g], axis=1)
+    return genetics
+
+        
+
 class DistributionVizualitation(APIView):
 
     #@api_view(['GET'])
     #@schema(None)
     def get(self,request,format=None):
         genetic = [patient.genetics for patient in Patient.objects.all()]
-        print(genetic)
+        users = [patient.code for patient in Patient.objects.all()]
+        dosis = [patient.weeklyDosisInRange for patient in Patient.objects.all()]
+        u_gen = make_data_frame(genetic, users, dosis)
 
-        return Response(genetic)
+        print(u_gen)
+
+        return Response({"message": u_gen})
