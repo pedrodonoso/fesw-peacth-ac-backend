@@ -3,4 +3,5 @@ djangorestframework==3.12.4
 django-filter==2.4.0
 djongo==1.3.6
 numpy
+pandas
 dnspython
