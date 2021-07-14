@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'PeacthAC.wsgi.application'
 #}
 
 import os
-USE_TZ = True
+USE_TZ = False
 
 DATABASES = {
             'default': {
