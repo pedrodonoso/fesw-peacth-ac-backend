@@ -7,6 +7,6 @@ numpy
 pandas
 matplotlib
 dnspython
-psycopg2==2.9.1
-django-heroku==0.3.1
+#psycopg2==2.9.1
+#django-heroku==0.3.1
 gunicorn

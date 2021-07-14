@@ -150,13 +150,13 @@ class LogWTDparametresViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-def make_data_frame(genetic, users, dosis):
+def make_data_frame(genetic, dosis):
     df_g = pd.DataFrame(genetic)
-    df_u = pd.DataFrame(users)
     df_d = pd.DataFrame(dosis, columns = ['dosis'])
 
-    genetics = pd.concat([df_u, df_d, df_g], axis=1)
-    return genetics
+    df_genetics = pd.concat([df_d, df_g], axis=1)
+
+    return df_genetics
 
         
 
@@ -165,11 +165,30 @@ class DistributionVizualitation(APIView):
     #@api_view(['GET'])
     #@schema(None)
     def get(self,request,format=None):
+        
+        #Petición
+        x = 'CYP2C9_2'
+        y = '*1/*1'
+
         genetic = [patient.genetics for patient in Patient.objects.all()]
-        users = [patient.code for patient in Patient.objects.all()]
         dosis = [patient.weeklyDosisInRange for patient in Patient.objects.all()]
-        u_gen = make_data_frame(genetic, users, dosis)
 
-        print(u_gen)
+        gens = make_data_frame(genetic, dosis)
 
-        return Response({"message": u_gen})
+        fillter= gens[x] == y
+        gens_f = gens[fillter]
+
+        #[min, Q1, Q2, Q3, max]
+        q1 = np.percentile(gens_f['dosis'],25)
+        q2 = np.percentile(gens_f['dosis'],50)
+        q3 = np.percentile(gens_f['dosis'],75)
+        mn = q1 - 1.5*(q3-q1)
+        mx = q3 + 1.5*(q3-q1)
+
+        print(mn,q1,q2,q3,mx)
+
+        response = {
+                        y : [mn, q1, q2 ,q3, mx]
+                    }
+
+        return Response(response, status=status.HTTP_200_OK)
