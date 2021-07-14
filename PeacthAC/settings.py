@@ -94,7 +94,7 @@ DATABASES = {
                 'ENGINE': 'djongo',
                 'NAME': 'peacth-ac',
                 'CLIENT': {
-                    'host': str(os.environ.get('MONGODB_URI')),
+                    'host': str(os.environ['MONGODB_URI']),
                     'authMechanism': 'SCRAM-SHA-1'                    
                 }
             }
