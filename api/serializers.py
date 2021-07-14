@@ -22,7 +22,7 @@ class ClinicalControlSerializer(serializers.ModelSerializer):
         model = ClinicalControl
         fields = '__all__'
 
-class LogWTDparametresSerializer(serializers.ModelSerializer):
+class LogWTDparametersSerializer(serializers.ModelSerializer):
     class Meta:
-        model = LogWTDparametres
+        model = LogWTDparameters
         fields = '__all__'

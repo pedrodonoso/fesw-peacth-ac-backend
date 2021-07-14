@@ -33,7 +33,7 @@ class Patient(models.Model):
     initialINR = models.FloatField()
     weeklyDosisInRange = models.FloatField(default=0)
     totalDays = models.IntegerField(default=0)
-    weight = models.IntegerField()
+    weight = models.FloatField()
     height = models.FloatField()
     imc = models.FloatField()
     age = models.IntegerField(default=0)
@@ -57,7 +57,7 @@ class ClinicalControl(models.Model):
     arrivalINR = models.FloatField(default=0)
     inrInRange = models.BooleanField(default=False)
 
-class LogWTDparametres(models.Model):
+class LogWTDparameters(models.Model):
     _id = models.ObjectIdField()
     p_1  = models.FloatField(default=0)
     p_2  = models.FloatField(default=0)

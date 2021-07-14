@@ -61,7 +61,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
         print(serializer.is_valid())
 
         if serializer.is_valid():
-            param = LogWTDparametres.objects.last()
+            param = LogWTDparameters.objects.last()
 
             initialDosis = calculate_dosis(request_data, param)
             
@@ -128,18 +128,18 @@ class ClinicalControlViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class LogWTDparametresViewSet(viewsets.ModelViewSet):
+class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
-    serializer_class = LogWTDparametresSerializer
-    queryset = LogWTDparametres.objects.all()
+    serializer_class = LogWTDparametersSerializer
+    queryset = LogWTDparameters.objects.all()
 
     @action(detail=True, methods=['post'])
     def set_parametres(self, request, pk=None):
-        self.serializer_class = LogWTDparametresSerializer
+        self.serializer_class = LogWTDparametersSerializer
 
         request_data = request.data
 
-        serializer = LogWTDparametresSerializer(data=request_data)
+        serializer = LogWTDparametersSerializer(data=request_data)
 
         if serializer.is_valid():
             serializer.save()
@@ -160,7 +160,7 @@ def make_data_frame(genetic, dosis):
 
         
 
-class DistributionVizualitation(APIView):
+class BoxplotVizualitation(APIView):
 
     #@api_view(['GET'])
     #@schema(None)
@@ -168,7 +168,7 @@ class DistributionVizualitation(APIView):
         
         #Petición
         x = 'CYP2C9_2'
-        y = '*1/*1'
+        y = '*1/*2'
 
         genetic = [patient.genetics for patient in Patient.objects.all()]
         dosis = [patient.weeklyDosisInRange for patient in Patient.objects.all()]
@@ -190,5 +190,28 @@ class DistributionVizualitation(APIView):
         response = {
                         y : [mn, q1, q2 ,q3, mx]
                     }
+
+        return Response(response, status=status.HTTP_200_OK)
+
+class FrequencyVizualitation(APIView):
+    
+    def get(self,request,format=None):
+
+        #Petición
+        x = 'CYP2C9_2'
+
+        genetic = [patient.genetics for patient in Patient.objects.all()]
+        dosis = [patient.weeklyDosisInRange for patient in Patient.objects.all()]
+
+        gens = make_data_frame(genetic, dosis)
+
+        print(gens[x].unique())
+
+        #fillter= gens[x] == y
+        #gens_f = gens[fillter]        
+
+        response = {
+                        'hola' : 'asjdkghaiksj'
+                }
 
         return Response(response, status=status.HTTP_200_OK)
