@@ -198,20 +198,20 @@ class FrequencyVizualitation(APIView):
     def get(self,request,format=None):
 
         #Petición
-        x = 'CYP2C9_2'
+        x = 'CYP2C9_3'
 
         genetic = [patient.genetics for patient in Patient.objects.all()]
         dosis = [patient.weeklyDosisInRange for patient in Patient.objects.all()]
 
         gens = make_data_frame(genetic, dosis)
 
-        print(gens[x].unique())
+        freq = gens[x].value_counts()
 
-        #fillter= gens[x] == y
-        #gens_f = gens[fillter]        
+        print(freq)
 
         response = {
-                        'hola' : 'asjdkghaiksj'
+                        'labels' : freq.index.tolist(),
+                        'frequency': freq
                 }
 
         return Response(response, status=status.HTTP_200_OK)
