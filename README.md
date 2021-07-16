@@ -57,11 +57,13 @@ This method calculate the dose of the patients
     			"VKORC1": "A/A"      
     		}
     }
+	```
 + Response
 	```
 	{ 
 		"initialDose": 8.543749816393767 
 	}
+	```
 ### Registra visitas
 #### Ver todos los controles registrados [GET]
 This method allows us to see all the information about medical checks.
@@ -77,6 +79,7 @@ This method allows us to see all the information about medical checks.
 			"arrivalINR":  1.1,  
 			"inrInRange":  false
 		}
+	```
 #### Registrar visita [POST]
 This method save the information about patient's medical checks 
 - https://peacth-ac-backend.herokuapp.com/api/clinical_control/register_visit/register_visit/
@@ -91,11 +94,13 @@ This method save the information about patient's medical checks
 			  "arrivalINR":  1.1,  
 			  "inrInRange":  false  
 			}
+		```
 	+ Response
 		```
 		{ 
 			"message": "Saved Succesfully"
 		}
+		```
 ### Actualizar parámetros del algoritmo manualmente
 #### Actualizar parámetros de forma manual [POST]
 This method allow us change the current parameters of the pharmacogenetics algorithm
@@ -115,11 +120,13 @@ This method allow us change the current parameters of the pharmacogenetics algor
 			"p_VKORC1_GA":  0.27,  
 			"p_VKORC1_AA":  0.701  
 		}
+		```
 	+ Response
 		```
 		{ 
 			"message": "Parametres updated Succesfully"
 		}
+		```
 #### Obtener la última actualización de los parámetros [GET]
 This method allow us change the current parameters of the pharmacogenetics algorithm
 - https://peacth-ac-backend.herokuapp.com/api/LogWTDparameters/get_last/get_last
@@ -139,6 +146,7 @@ This method allow us change the current parameters of the pharmacogenetics algor
 			"p_VKORC1_GA": 0.27,
 			"p_VKORC1_AA": 0.701
 		}
+		```
 ### Análisis comparativo de la dosis calculada entre genotipos ingresados
 + Parameters
 		+ gen (string) : the gene for which information is required
@@ -179,6 +187,7 @@ This method get information needed to plot boxplot
 			]
 		}
 	]
+	```
 #### Información distribución [GET]
 This methos get information for distribution plots
 - https://peacth-ac-backend.herokuapp.com/api/distributions/frequency/{gen}
@@ -196,6 +205,7 @@ This methos get information for distribution plots
 			65
 		]
 	}
+	```
 
 <div id='ayudas' />
 
