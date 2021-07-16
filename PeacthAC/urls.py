@@ -23,5 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/distributions/boxplot', BoxplotVizualitation.as_view(), name="boxplot"),
-    path('api/distributions/frequency', FrequencyVizualitation.as_view(), name="frequency")
+    path('api/distributions/frequency/<str:variable>', FrequencyVizualitation.as_view(), name="frequency")
 ]

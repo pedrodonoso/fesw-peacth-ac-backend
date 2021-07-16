@@ -209,10 +209,12 @@ class BoxplotVizualitation(APIView):
 
 class FrequencyVizualitation(APIView):
     
-    def get(self,request,format=None):
+    def get(self,request, **kwargs):
+
+        print(kwargs['variable'])
 
         #Petición
-        x = 'CYP2C9_3'
+        x = kwargs['variable'] # 'CYP2C9_3'
 
         genetic = [patient.genetics for patient in Patient.objects.all()]
         dosis = [patient.weeklyDoseInRange for patient in Patient.objects.all()]

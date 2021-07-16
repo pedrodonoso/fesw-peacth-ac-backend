@@ -88,6 +88,7 @@ DATABASES = {
 }
 '''
 
+
 import os
 
 DATABASES = {
