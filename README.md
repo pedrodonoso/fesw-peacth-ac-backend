@@ -26,7 +26,7 @@ python3 manage.py migrate
 
 ```
 
-<div id='api />
+<div id='api' />
 
 # Documentación API
 
