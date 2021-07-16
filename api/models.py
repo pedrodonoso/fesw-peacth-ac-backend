@@ -14,24 +14,14 @@ class Genetic(models.Model):
         abstract = isMigrate
 
 
-class Diagnosis(models.Model):
-    diagnosis1 = models.CharField(max_length=256)
-    diagnosis2 = models.CharField(max_length=256)
-    diagnosis3 = models.CharField(max_length=256)
-    diagnosis4 = models.CharField(max_length=256)
-
-    class Meta:
-        abstract = isMigrate
-
 class Patient(models.Model):
     _id = models.ObjectIdField()
     code = models.CharField(unique=True, max_length=5)
     sex = models.CharField(max_length=1)
-    bloodType = models.CharField(max_length=256)
     initialDate = models.DateField(default=datetime.date.today)
-    initialDosis = models.FloatField(default=0)
+    initialDose = models.FloatField(default=0)
     initialINR = models.FloatField()
-    weeklyDosisInRange = models.FloatField(default=0)
+    weeklyDoseInRange = models.FloatField(default=0)
     totalDays = models.IntegerField(default=0)
     weight = models.FloatField()
     height = models.FloatField()
@@ -40,10 +30,6 @@ class Patient(models.Model):
 
     genetics = models.EmbeddedField(
         model_container=Genetic
-    )
-
-    diagnosis = models.EmbeddedField(
-        model_container=Diagnosis
     )
 
     objects = models.DjongoManager()
@@ -59,13 +45,13 @@ class ClinicalControl(models.Model):
 
 class LogWTDparameters(models.Model):
     _id = models.ObjectIdField()
-    p_1  = models.FloatField(default=0)
-    p_2  = models.FloatField(default=0)
-    p_3  = models.FloatField(default=0)
-    p_4  = models.FloatField(default=0)
-    p_5  = models.FloatField(default=0)
-    p_6  = models.FloatField(default=0)
-    p_7  = models.FloatField(default=0)
-    p_8  = models.FloatField(default=0)
-    p_9  = models.FloatField(default=0)
-    p_10 = models.FloatField(default=0)
+    p_0 = models.FloatField(default=0)
+    p_men = models.FloatField(default=0)
+    p_age = models.FloatField(default=0)
+    p_initialINR  = models.FloatField(default=0)
+    p_imc = models.FloatField(default=0)
+    p_CYP2C9_12  = models.FloatField(default=0)
+    p_CYP2C9_13 = models.FloatField(default=0)
+    p_CYP2C9_33 = models.FloatField(default=0)
+    p_VKORC1_GA = models.FloatField(default=0)
+    p_VKORC1_AA = models.FloatField(default=0)

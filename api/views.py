@@ -14,6 +14,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from rest_framework.views import APIView
 from datetime import date
+import json
+from rest_framework import serializers as rest_serializers
 
 def calculate_dosis(data,params):
     age = data['age']
@@ -35,7 +37,7 @@ def calculate_dosis(data,params):
     VKORC1_AA = 1 if data['genetics']['VKORC1'] == 'A/A' else 0
     print(VKORC1_AA)
 
-    logWTD = params.p_1 + (params.p_2 * men) - (age * params.p_3) - (initialINR * params.p_4) + (imc * params.p_5) - (CYP2C9_2_12 * params.p_6) - (CYP2C9_3_13 * params.p_7) - (CYP2C9_3_33 * params.p_8) - (VKORC1_GA * params.p_9) - (VKORC1_AA * params.p_10)
+    logWTD = params.p_0 + (params.p_men * men) - (age * params.p_age) - (initialINR * params.p_initialINR) + (imc * params.p_imc) - (CYP2C9_2_12 * params.p_CYP2C9_12) - (CYP2C9_3_13 * params.p_CYP2C9_13) - (CYP2C9_3_33 * params.p_CYP2C9_33) - (VKORC1_GA * params.p_VKORC1_GA) - (VKORC1_AA * params.p_VKORC1_AA)
     print(logWTD)
         
     return np.exp(logWTD)
@@ -63,9 +65,9 @@ class PatientModelViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             param = LogWTDparameters.objects.last()
 
-            initialDosis = calculate_dosis(request_data, param)
+            initialDose = calculate_dosis(request_data, param)
             
-            request_data['initialDosis'] = initialDosis
+            request_data['initialDose'] = initialDose
 
             serializer = PatientSerializer(data=request_data)
             if serializer.is_valid():
@@ -73,7 +75,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
                     'patientCode' : request_data['code'],
                     'controlDate' : request_data['initialDate'],
                     'arrivalDose' : 0,
-                    'updatedDose': initialDosis,
+                    'updatedDose': initialDose,
                     'arrivalINR': request_data['initialINR'],
                     'inrInRange': False
                 }
@@ -83,7 +85,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
                     control_serializer.save()
                     serializer.save()
                     response = {
-                        'initialDosis' : initialDosis
+                        'initialDose' : initialDose
                     }
 
                     return Response(response, status=status.HTTP_200_OK)
@@ -117,7 +119,7 @@ class ClinicalControlViewSet(viewsets.ModelViewSet):
             print(delta.days)
             print(patient.totalDays)
             if request_data['inrInRange']:
-                patient.weeklyDosisInRange = request_data['arrivalDose']
+                patient.weeklyDoseInRange = request_data['arrivalDose']
             patient.save()
             serializer.save()
             response = {
@@ -149,6 +151,18 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
             return Response(response, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['get'])
+    def get_last(self, request, pk=None):
+        self.serializer_class = LogWTDparametersSerializer
+
+        last_parameters = LogWTDparameters.objects.last()
+        json = LogWTDparametersSerializer(last_parameters)
+        print(json.data)
+
+
+        return Response(json.data, status=status.HTTP_200_OK)
+
 
 def make_data_frame(genetic, dosis):
     df_g = pd.DataFrame(genetic)
@@ -171,7 +185,7 @@ class BoxplotVizualitation(APIView):
         y = '*1/*2'
 
         genetic = [patient.genetics for patient in Patient.objects.all()]
-        dosis = [patient.weeklyDosisInRange for patient in Patient.objects.all()]
+        dosis = [patient.weeklyDoseInRange for patient in Patient.objects.all()]
 
         gens = make_data_frame(genetic, dosis)
 
@@ -201,7 +215,7 @@ class FrequencyVizualitation(APIView):
         x = 'CYP2C9_3'
 
         genetic = [patient.genetics for patient in Patient.objects.all()]
-        dosis = [patient.weeklyDosisInRange for patient in Patient.objects.all()]
+        dosis = [patient.weeklyDoseInRange for patient in Patient.objects.all()]
 
         gens = make_data_frame(genetic, dosis)
 
