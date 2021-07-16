@@ -178,10 +178,10 @@ class BoxplotVizualitation(APIView):
 
     #@api_view(['GET'])
     #@schema(None)
-    def get(self,request,format=None):
+    def get(self,request,format=None,**kwargs):
         
         #Petición
-        x = 'CYP2C9_2'
+        x = kwargs['variable']
         
 
         genetic = [patient.genetics for patient in Patient.objects.all()]
@@ -193,30 +193,40 @@ class BoxplotVizualitation(APIView):
 
         print(y)
 
-        fillter= gens[x] == y[1]
-        gens_f = gens[fillter]
+        l= []
 
-        #[min, Q1, Q2, Q3, max]
-        q1 = np.percentile(gens_f['dosis'],25)
-        q2 = np.percentile(gens_f['dosis'],50)
-        q3 = np.percentile(gens_f['dosis'],75)
-        mn = q1 - 1.5*(q3-q1)
-        mx = q3 + 1.5*(q3-q1)
+        for i in y:
+            aux = {}
 
-        print(mn,q1,q2,q3,mx)
+            fillter= gens[x] == i
+            gens_f = gens[fillter]
 
-        response = {
-                        y[0] : [mn, q1, q2 ,q3, mx]
-                    }
+            #[min, Q1, Q2, Q3, max]
+            q1 = np.percentile(gens_f['dosis'],25)
+            q2 = np.percentile(gens_f['dosis'],50)
+            q3 = np.percentile(gens_f['dosis'],75)
+            mn = q1 - 1.5*(q3-q1)
+            mx = q3 + 1.5*(q3-q1)
+
+            aux['label'] = i
+            aux['value'] = [mn, q1, q2 ,q3, mx]
+
+            l.append(aux)
+
+            print(mn,q1,q2,q3,mx)
+
+        response = l
 
         return Response(response, status=status.HTTP_200_OK)
 
 class FrequencyVizualitation(APIView):
     
-    def get(self,request,format=None):
+    def get(self,request, **kwargs):
+
+        print(kwargs['variable'])
 
         #Petición
-        x = 'CYP2C9_3'
+        x = kwargs['variable'] # 'CYP2C9_3'
 
         genetic = [patient.genetics for patient in Patient.objects.all()]
         dosis = [patient.weeklyDoseInRange for patient in Patient.objects.all()]
