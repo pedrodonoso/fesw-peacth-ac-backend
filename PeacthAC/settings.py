@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'PeacthAC.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 # mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/test
-'''
+
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
@@ -86,8 +86,8 @@ DATABASES = {
         }
     }
 }
-'''
 
+'''
 import os
 
 DATABASES = {
@@ -100,7 +100,7 @@ DATABASES = {
                 }
             }
     }
-
+'''
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -145,5 +145,5 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-import django_heroku
-django_heroku.settings(locals(), databases=False)
+#import django_heroku
+#django_heroku.settings(locals(), databases=False)

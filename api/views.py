@@ -182,14 +182,18 @@ class BoxplotVizualitation(APIView):
         
         #Petición
         x = 'CYP2C9_2'
-        y = '*1/*2'
+        
 
         genetic = [patient.genetics for patient in Patient.objects.all()]
         dosis = [patient.weeklyDoseInRange for patient in Patient.objects.all()]
 
         gens = make_data_frame(genetic, dosis)
 
-        fillter= gens[x] == y
+        y = gens[x].unique()
+
+        print(y)
+
+        fillter= gens[x] == y[1]
         gens_f = gens[fillter]
 
         #[min, Q1, Q2, Q3, max]
@@ -202,7 +206,7 @@ class BoxplotVizualitation(APIView):
         print(mn,q1,q2,q3,mx)
 
         response = {
-                        y : [mn, q1, q2 ,q3, mx]
+                        y[0] : [mn, q1, q2 ,q3, mx]
                     }
 
         return Response(response, status=status.HTTP_200_OK)
