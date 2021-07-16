@@ -1,7 +1,12 @@
 django==3.0.5
 djangorestframework==3.12.4
 django-filter==2.4.0
+sqlparse==0.2.4
 djongo==1.3.6
 numpy
 pandas
+matplotlib
 dnspython
+psycopg2==2.9.1
+django-heroku==0.3.1
+gunicorn

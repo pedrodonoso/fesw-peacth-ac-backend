@@ -1,5 +1,4 @@
 from PeacthAC.settings import DATABASES
-import re
 from rest_framework import response
 from rest_framework.serializers import Serializer
 from api import serializers
@@ -11,7 +10,12 @@ from rest_framework.response import Response
 from api.models import *
 from api.serializers import *
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 from rest_framework.views import APIView
+from datetime import date
+import json
+from rest_framework import serializers as rest_serializers
 
 def calculate_dosis(data,params):
     age = data['age']
@@ -33,7 +37,7 @@ def calculate_dosis(data,params):
     VKORC1_AA = 1 if data['genetics']['VKORC1'] == 'A/A' else 0
     print(VKORC1_AA)
 
-    logWTD = params.p_1 + (params.p_2 * men) - (age * params.p_3) - (initialINR * params.p_4) + (imc * params.p_5) - (CYP2C9_2_12 * params.p_6) - (CYP2C9_3_13 * params.p_7) - (CYP2C9_3_33 * params.p_8) - (VKORC1_GA * params.p_9) - (VKORC1_AA * params.p_10)
+    logWTD = params.p_0 + (params.p_men * men) - (age * params.p_age) - (initialINR * params.p_initialINR) + (imc * params.p_imc) - (CYP2C9_2_12 * params.p_CYP2C9_12) - (CYP2C9_3_13 * params.p_CYP2C9_13) - (CYP2C9_3_33 * params.p_CYP2C9_33) - (VKORC1_GA * params.p_VKORC1_GA) - (VKORC1_AA * params.p_VKORC1_AA)
     print(logWTD)
         
     return np.exp(logWTD)
@@ -59,11 +63,11 @@ class PatientModelViewSet(viewsets.ModelViewSet):
         print(serializer.is_valid())
 
         if serializer.is_valid():
-            param = LogWTDparametres.objects.last()
+            param = LogWTDparameters.objects.last()
 
-            initialDosis = calculate_dosis(request_data, param)
+            initialDose = calculate_dosis(request_data, param)
             
-            request_data['initialDosis'] = initialDosis
+            request_data['initialDose'] = initialDose
 
             serializer = PatientSerializer(data=request_data)
             if serializer.is_valid():
@@ -71,7 +75,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
                     'patientCode' : request_data['code'],
                     'controlDate' : request_data['initialDate'],
                     'arrivalDose' : 0,
-                    'updatedDose': initialDosis,
+                    'updatedDose': initialDose,
                     'arrivalINR': request_data['initialINR'],
                     'inrInRange': False
                 }
@@ -81,7 +85,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
                     control_serializer.save()
                     serializer.save()
                     response = {
-                        'initialDosis' : initialDosis
+                        'initialDose' : initialDose
                     }
 
                     return Response(response, status=status.HTTP_200_OK)
@@ -102,11 +106,21 @@ class ClinicalControlViewSet(viewsets.ModelViewSet):
         request_data = request.data
 
         serializer = ClinicalControlSerializer(data=request_data)
-        patients = Patient.objects.get(code=request_data['patientCode'])
-        print(patients.code)
-
+        patient = Patient.objects.get(code=request_data['patientCode'])
+        print(patient.code)
+        
 
         if serializer.is_valid():
+            initialDate = patient.initialDate
+            newDate = request_data['controlDate'].split('-')
+            controlDate = date(int(newDate[0]),int(newDate[1]),int(newDate[2]))
+            delta = controlDate - initialDate
+            patient.totalDays = delta.days
+            print(delta.days)
+            print(patient.totalDays)
+            if request_data['inrInRange']:
+                patient.weeklyDoseInRange = request_data['arrivalDose']
+            patient.save()
             serializer.save()
             response = {
                 'message' : 'Saved Succesfully'
@@ -116,18 +130,18 @@ class ClinicalControlViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class LogWTDparametresViewSet(viewsets.ModelViewSet):
+class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
-    serializer_class = LogWTDparametresSerializer
-    queryset = LogWTDparametres.objects.all()
+    serializer_class = LogWTDparametersSerializer
+    queryset = LogWTDparameters.objects.all()
 
     @action(detail=True, methods=['post'])
     def set_parametres(self, request, pk=None):
-        self.serializer_class = LogWTDparametresSerializer
+        self.serializer_class = LogWTDparametersSerializer
 
         request_data = request.data
 
-        serializer = LogWTDparametresSerializer(data=request_data)
+        serializer = LogWTDparametersSerializer(data=request_data)
 
         if serializer.is_valid():
             serializer.save()
@@ -137,13 +151,81 @@ class LogWTDparametresViewSet(viewsets.ModelViewSet):
             return Response(response, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['get'])
+    def get_last(self, request, pk=None):
+        self.serializer_class = LogWTDparametersSerializer
 
-class DistributionVizualitation(APIView):
+        last_parameters = LogWTDparameters.objects.last()
+        json = LogWTDparametersSerializer(last_parameters)
+        print(json.data)
+
+
+        return Response(json.data, status=status.HTTP_200_OK)
+
+
+def make_data_frame(genetic, dosis):
+    df_g = pd.DataFrame(genetic)
+    df_d = pd.DataFrame(dosis, columns = ['dosis'])
+
+    df_genetics = pd.concat([df_d, df_g], axis=1)
+
+    return df_genetics
+
+        
+
+class BoxplotVizualitation(APIView):
 
     #@api_view(['GET'])
     #@schema(None)
     def get(self,request,format=None):
-        genetic = [patient.genetics for patient in Patient.objects.all()]
-        print(genetic)
+        
+        #Petición
+        x = 'CYP2C9_2'
+        y = '*1/*2'
 
-        return Response({"message": "Will not appear in schema!"})
+        genetic = [patient.genetics for patient in Patient.objects.all()]
+        dosis = [patient.weeklyDoseInRange for patient in Patient.objects.all()]
+
+        gens = make_data_frame(genetic, dosis)
+
+        fillter= gens[x] == y
+        gens_f = gens[fillter]
+
+        #[min, Q1, Q2, Q3, max]
+        q1 = np.percentile(gens_f['dosis'],25)
+        q2 = np.percentile(gens_f['dosis'],50)
+        q3 = np.percentile(gens_f['dosis'],75)
+        mn = q1 - 1.5*(q3-q1)
+        mx = q3 + 1.5*(q3-q1)
+
+        print(mn,q1,q2,q3,mx)
+
+        response = {
+                        y : [mn, q1, q2 ,q3, mx]
+                    }
+
+        return Response(response, status=status.HTTP_200_OK)
+
+class FrequencyVizualitation(APIView):
+    
+    def get(self,request,format=None):
+
+        #Petición
+        x = 'CYP2C9_3'
+
+        genetic = [patient.genetics for patient in Patient.objects.all()]
+        dosis = [patient.weeklyDoseInRange for patient in Patient.objects.all()]
+
+        gens = make_data_frame(genetic, dosis)
+
+        freq = gens[x].value_counts()
+
+        print(freq)
+
+        response = {
+                        'labels' : freq.index.tolist(),
+                        'frequency': freq
+                }
+
+        return Response(response, status=status.HTTP_200_OK)

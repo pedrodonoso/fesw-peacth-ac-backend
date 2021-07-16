@@ -7,10 +7,6 @@ class GeneticSerializer(serializers.ModelSerializer):
         model = Genetic
         fields = '__all__'
 
-class DiagnosisSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Diagnosis
-        fields = '__all__'
 
 class PatientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,7 +18,7 @@ class ClinicalControlSerializer(serializers.ModelSerializer):
         model = ClinicalControl
         fields = '__all__'
 
-class LogWTDparametresSerializer(serializers.ModelSerializer):
+class LogWTDparametersSerializer(serializers.ModelSerializer):
     class Meta:
-        model = LogWTDparametres
+        model = LogWTDparameters
         fields = '__all__'

@@ -76,19 +76,30 @@ WSGI_APPLICATION = 'PeacthAC.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 # mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/test
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'peacth-ac',
-        #'CLIENT':{
-<<<<<<< HEAD
-        #    'host': 'mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/peacth-ac?retryWrites=true&w=majority'
-=======
-         #   'host': 'mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/peacth-ac?retryWrites=true&w=majority'
->>>>>>> 11197b6f78e6c2f3ee50048766c864eb0a3a5026
-        #}
+        'CLIENT':{
+            'host': 'mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/peacth-ac?retryWrites=true&w=majority'
+        }
     }
 }
+'''
+
+import os
+
+DATABASES = {
+            'default': {
+                'ENGINE': 'djongo',
+                'NAME': 'peacth-ac',
+                'CLIENT': {
+                    'host': str(os.environ['MONGODB_URI']),
+                    'authMechanism': 'SCRAM-SHA-1'                    
+                }
+            }
+    }
 
 
 # Password validation
@@ -133,3 +144,6 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+import django_heroku
+django_heroku.settings(locals(), databases=False)
