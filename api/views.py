@@ -57,7 +57,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
 
         request_data = request.data
 
-        print(request_data['code'])
+        #print(request_data['code'])
 
         serializer = PatientSerializer(data=request_data)
         print(serializer.is_valid())
