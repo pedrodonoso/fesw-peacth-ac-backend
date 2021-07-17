@@ -69,17 +69,17 @@ This method calculate the dose of the patients
 This method allows us to see all the information about medical checks.
 - https://peacth-ac-backend.herokuapp.com/api/clinical_control/
 + Response (application JSON)
-		```
-		{ 
-			"_id":  "60f1e93f08956a1ceb4ffb5a",  
-			"patientCode":  "T-999",  
-			"controlDate":  "2009-11-30",  
-			"arrivalDose":  0.0,  
-			"updatedDose":  9.929399471052776,  
-			"arrivalINR":  1.1,  
-			"inrInRange":  false
-		}
-		```
+	```
+	{ 
+		"_id":  "60f1e93f08956a1ceb4ffb5a",  
+		"patientCode":  "T-999",  
+		"controlDate":  "2009-11-30",  
+		"arrivalDose":  0.0,  
+		"updatedDose":  9.929399471052776,  
+		"arrivalINR":  1.1,  
+		"inrInRange":  false
+	}
+	```
 #### Registrar visita [POST]
 This method save the information about patient's medical checks 
 - https://peacth-ac-backend.herokuapp.com/api/clinical_control/register_visit/register_visit/
@@ -96,11 +96,11 @@ This method save the information about patient's medical checks
 			}
 		```
 + Response (application/JSON)
-		```
-		{ 
-			"message": "Saved Succesfully"
-		}
-		```
+	```
+	{ 
+		"message": "Saved Succesfully"
+	}
+	```
 ### Actualizar parámetros del algoritmo manualmente
 #### Actualizar parámetros de forma manual [POST]
 This method allow us change the current parameters of the pharmacogenetics algorithm
@@ -122,30 +122,30 @@ This method allow us change the current parameters of the pharmacogenetics algor
 		}
 		```
 + Response (application/JSON)
-		```
-		{ 
-			"message": "Parametres updated Succesfully"
-		}
-		```
+	```
+	{ 
+		"message": "Parametres updated Succesfully"
+	}
+	```
 #### Obtener la última actualización de los parámetros [GET]
 This method allow us change the current parameters of the pharmacogenetics algorithm
 - https://peacth-ac-backend.herokuapp.com/api/LogWTDparameters/get_last/get_last
 + Response (application/JSON)
-		```
-		{
-			"_id": "60f1ee881f69782bda74a492",
-			"p_0": 3.081,
-			"p_men": 0.167,
-			"p_age": 0.0081,
-			"p_initialINR": 0.055,
-			"p_imc": 0.013,
-			"p_CYP2C9_12": 0.107,
-			"p_CYP2C9_13": 0.323,
-			"p_CYP2C9_33": 0.746,
-			"p_VKORC1_GA": 0.27,
-			"p_VKORC1_AA": 0.701
-		}
-		```
+	```
+	{
+		"_id": "60f1ee881f69782bda74a492",
+		"p_0": 3.081,
+		"p_men": 0.167,
+		"p_age": 0.0081,
+		"p_initialINR": 0.055,
+		"p_imc": 0.013,
+		"p_CYP2C9_12": 0.107,
+		"p_CYP2C9_13": 0.323,
+		"p_CYP2C9_33": 0.746,
+		"p_VKORC1_GA": 0.27,
+		"p_VKORC1_AA": 0.701
+	}
+	```
 ### Análisis comparativo de la dosis calculada entre genotipos ingresados
 + Parameters
 		+ gen (string) : the gene for which information is required
