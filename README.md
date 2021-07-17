@@ -52,7 +52,7 @@ This method calculate the dose of the patients
     		"imc": 28.3,                
     		"age": 69,                   
     		"genetics": {
-	    		"CYP2C9_2": "*1/*1", 
+				"CYP2C9_2": "*1/*1", 
     			"CYP2C9_3": "*1/*1", 
     			"VKORC1": "A/A"      
     		}
