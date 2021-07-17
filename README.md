@@ -69,7 +69,7 @@ This method calculate the dose of the patients
 This method allows us to see all the information about medical checks.
 - https://peacth-ac-backend.herokuapp.com/api/clinical_control/
 + Response (application JSON)
-	```
+		```
 		{ 
 			"_id":  "60f1e93f08956a1ceb4ffb5a",  
 			"patientCode":  "T-999",  
@@ -79,7 +79,7 @@ This method allows us to see all the information about medical checks.
 			"arrivalINR":  1.1,  
 			"inrInRange":  false
 		}
-	```
+		```
 #### Registrar visita [POST]
 This method save the information about patient's medical checks 
 - https://peacth-ac-backend.herokuapp.com/api/clinical_control/register_visit/register_visit/
