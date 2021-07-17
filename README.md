@@ -58,7 +58,7 @@ This method calculate the dose of the patients
     		}
     }
 	```
-+ Response
++ Response (application/JSON)
 	```
 	{ 
 		"initialDose": 8.543749816393767 
@@ -95,7 +95,7 @@ This method save the information about patient's medical checks
 			  "inrInRange":  false  
 			}
 		```
-	+ Response
++ Response (application/JSON)
 		```
 		{ 
 			"message": "Saved Succesfully"
@@ -121,7 +121,7 @@ This method allow us change the current parameters of the pharmacogenetics algor
 			"p_VKORC1_AA":  0.701  
 		}
 		```
-	+ Response
++ Response (application/JSON)
 		```
 		{ 
 			"message": "Parametres updated Succesfully"
@@ -130,8 +130,7 @@ This method allow us change the current parameters of the pharmacogenetics algor
 #### Obtener la última actualización de los parámetros [GET]
 This method allow us change the current parameters of the pharmacogenetics algorithm
 - https://peacth-ac-backend.herokuapp.com/api/LogWTDparameters/get_last/get_last
-+ Request (application/JSON)
-	+ Response
++ Response (application/JSON)
 		```
 		{
 			"_id": "60f1ee881f69782bda74a492",
