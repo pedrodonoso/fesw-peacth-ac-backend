@@ -59,11 +59,11 @@ This method calculate the dose of the patients
     }
 	```
 + Response (application/JSON)
-```
-{ 
+	```
+	{
 	"initialDose": 8.543749816393767 
-}
-```
+	}
+	```
 ### Registra visitas
 #### Ver todos los controles registrados [GET]
 This method allows us to see all the information about medical checks.
