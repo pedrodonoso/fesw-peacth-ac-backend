@@ -57,8 +57,8 @@ This method calculate the dose of the patients
         },
         ...
     ]
-#### Ver un paciente
-- https://peacth-ac-backend.herokuapp.com/api/patients/
+#### Ver un paciente [GET]
+- https://peacth-ac-backend.herokuapp.com/api/patients/{code}
 + Response
     ```
     {
