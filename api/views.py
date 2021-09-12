@@ -48,6 +48,17 @@ class PatientModelViewSet(viewsets.ModelViewSet):
     
     serializer_class = PatientSerializer
     queryset = Patient.objects.all()
+
+    def retrieve(self, request, pk=None):
+        try:
+            object = Patient.objects.get(code=pk)
+
+            serializer = self.get_serializer(object)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:            
+            return Response({"message" : "Patient not found"}, status=status.HTTP_404_NOT_FOUND)
+        
         
 
     @action(detail=True, methods=['post'])
