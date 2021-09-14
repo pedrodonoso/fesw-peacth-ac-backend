@@ -114,7 +114,10 @@ class PatientModelViewSet(viewsets.ModelViewSet):
 
             serializer = self.get_serializer(object)
 
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            data = serializer.data
+            data['genetics'] = json.loads(data['genetics'])
+
+            return Response(data, status=status.HTTP_200_OK)
         except:            
             return Response({"message" : "Patient not found"}, status=status.HTTP_404_NOT_FOUND)
         
