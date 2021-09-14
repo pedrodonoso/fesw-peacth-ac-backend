@@ -42,6 +42,65 @@ def calculate_dosis(data,params):
         
     return np.exp(logWTD)
 
+def make_data_frame(genetic, dosis):
+    df_g = pd.DataFrame(genetic)
+    df_d = pd.DataFrame(dosis, columns = ['dosis'])
+
+    df_genetics = pd.concat([df_d, df_g], axis=1)
+
+    return df_genetics
+
+def patients_dataframe(patients):
+    x_columns = ['men', 'age', 'initialINR', 'imc', 'CYP2C9_12', 'CYP2C9_13', 'CYP2C9_33', 'VKORC1_GA', 'VKORC1_AA', 'weeklyDoseInRange']
+
+    x_columns_values = [[],[],[],[],[],[],[],[],[]]
+
+    for p in patients:
+        serializer = PatientSerializer(p)
+        patient = serializer.data
+        genetics = json.loads(patient['genetics'])
+        
+
+        if patient['sex'] == 'M':
+            x_columns_values[0].append(1)
+        else:
+            x_columns_values[0].append(0)
+        
+        x_columns_values[1].append(patient['age'])
+        x_columns_values[2].append(patient['initialINR'])
+        x_columns_values[3].append(patient['imc'])
+        x_columns_values[9].append(patient['weeklyDoseInRange'])
+
+        if genetics['CYP2C9_2'] == '*1/*2':
+            x_columns_values[4].append(1)
+        else:
+            x_columns_values[4].append(0)
+
+        if genetics['CYP2C9_3'] == '*1/*3': 
+            x_columns_values[5].append(1)
+        else:
+            x_columns_values[5].append(0)
+
+        if genetics['CYP2C9_3'] == '*3/*3':
+            x_columns_values[6].append(1)
+        else:
+            x_columns_values[6].append(0)
+        
+        if genetics['VKORC1'] == 'A/A':
+            x_columns_values[7].append(0)
+            x_columns_values[8].append(1)
+        elif genetics['VKORC1'] == 'G/A':
+            x_columns_values[7].append(1)
+            x_columns_values[8].append(0)
+        else:
+            x_columns_values[7].append(0)
+            x_columns_values[8].append(0)
+        
+
+    df = pd.DataFrame(x_columns_values, x_columns)
+
+    print(df)
+
 
 # Create your views here.
 class PatientModelViewSet(viewsets.ModelViewSet):
@@ -174,15 +233,12 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
         return Response(json.data, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['get'])
+    def multivariable_regression(self, request, pk=None):
+        patients = Patient.objects.filter(weeklyDoseInRange__gt=0)
 
-def make_data_frame(genetic, dosis):
-    df_g = pd.DataFrame(genetic)
-    df_d = pd.DataFrame(dosis, columns = ['dosis'])
-
-    df_genetics = pd.concat([df_d, df_g], axis=1)
-
-    return df_genetics
-
+        df = patients_dataframe(patients)
+        
         
 
 class BoxplotVizualitation(APIView):

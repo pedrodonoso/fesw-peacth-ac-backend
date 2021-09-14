@@ -103,7 +103,7 @@ CORS_ALLOW_HEADERS = [
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 # mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/test
 
-'''
+
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
@@ -127,7 +127,7 @@ DATABASES = {
                 }
             }
     }
-
+'''
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
