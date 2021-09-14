@@ -120,7 +120,21 @@ class PatientModelViewSet(viewsets.ModelViewSet):
             return Response(data, status=status.HTTP_200_OK)
         except:            
             return Response({"message" : "Patient not found"}, status=status.HTTP_404_NOT_FOUND)
-        
+
+    def list(self, request):
+        try:
+            patientsObjects = Patient.objects.all()
+            serializer = self.get_serializer(patientsObjects, many=True)
+
+            patients = serializer.data
+
+            for p in patients:
+                p['genetics'] = json.loads(p['genetics'])
+
+            return Response(patients, status=status.HTTP_200_OK)
+        except:
+            return Response({"message" : "NULL"}, status=status.HTTP_404_NOT_FOUND)
+
         
 
     @action(detail=True, methods=['post'])
