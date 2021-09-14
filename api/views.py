@@ -11,6 +11,7 @@ from api.models import *
 from api.serializers import *
 import numpy as np
 import pandas as pd
+from sklearn import linear_model
 import matplotlib.pyplot as plt
 from rest_framework.views import APIView
 from datetime import date
@@ -51,9 +52,11 @@ def make_data_frame(genetic, dosis):
     return df_genetics
 
 def patients_dataframe(patients):
-    x_columns = ['men', 'age', 'initialINR', 'imc', 'CYP2C9_12', 'CYP2C9_13', 'CYP2C9_33', 'VKORC1_GA', 'VKORC1_AA', 'weeklyDoseInRange']
+    x_columns = ['men', 'age', 'initialINR', 'imc', 'CYP2C9_12', 'CYP2C9_13', 'CYP2C9_33', 'VKORC1_GA', 'VKORC1_AA']
+    y_columns = ['weeklyDoseInRange']
 
     x_columns_values = [[],[],[],[],[],[],[],[],[]]
+    y_columns_values = [[]]
 
     for p in patients:
         serializer = PatientSerializer(p)
@@ -69,7 +72,7 @@ def patients_dataframe(patients):
         x_columns_values[1].append(patient['age'])
         x_columns_values[2].append(patient['initialINR'])
         x_columns_values[3].append(patient['imc'])
-        x_columns_values[9].append(patient['weeklyDoseInRange'])
+        y_columns_values[0].append(patient['weeklyDoseInRange'])
 
         if genetics['CYP2C9_2'] == '*1/*2':
             x_columns_values[4].append(1)
@@ -97,10 +100,13 @@ def patients_dataframe(patients):
             x_columns_values[8].append(0)
         
 
-    df = pd.DataFrame(x_columns_values, x_columns)
+    X = pd.DataFrame(x_columns_values, x_columns).T
+    #X.columns = x_columns
+    Y = pd.DataFrame(y_columns_values, y_columns).T
+    #Y.columns = y_columns
 
-    print(df)
-
+    #print(df)
+    return (X,Y)
 
 # Create your views here.
 class PatientModelViewSet(viewsets.ModelViewSet):
@@ -254,8 +260,14 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
     def multivariable_regression(self, request, pk=None):
         patients = Patient.objects.filter(weeklyDoseInRange__gt=0)
 
-        df = patients_dataframe(patients)
-        
+        (X, Y)= patients_dataframe(patients)
+        print (X)
+
+        regr = linear_model.LinearRegression()
+        regr.fit(X, Y)
+
+        print('Intercept: \n', regr.intercept_)
+        print('Coefficients: \n', regr.coef_)
         
 
 class BoxplotVizualitation(APIView):
@@ -268,8 +280,8 @@ class BoxplotVizualitation(APIView):
         x = kwargs['variable']
         
 
-        genetic = [patient.genetics for patient in Patient.objects.all()]
-        dosis = [patient.weeklyDoseInRange for patient in Patient.objects.all()]
+        genetic = [patient.genetics for patient in Patient.objects.filter(weeklyDoseInRange__gt=0)]
+        dosis = [patient.weeklyDoseInRange for patient in Patient.objects.filter(weeklyDoseInRange__gt=0)]
 
         gens = make_data_frame(genetic, dosis)
 
