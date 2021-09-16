@@ -11,12 +11,14 @@ from api.models import *
 from api.serializers import *
 import numpy as np
 import pandas as pd
-from sklearn import linear_model
+import statsmodels.api as sfm
 import matplotlib.pyplot as plt
 from rest_framework.views import APIView
 from datetime import date
 import json
 from rest_framework import serializers as rest_serializers
+
+
 
 def calculate_dosis(data,params):
     age = data['age']
@@ -52,11 +54,13 @@ def make_data_frame(genetic, dosis):
     return df_genetics
 
 def patients_dataframe(patients):
-    x_columns = ['men', 'age', 'initialINR', 'imc', 'CYP2C9_12', 'CYP2C9_13', 'CYP2C9_33', 'VKORC1_GA', 'VKORC1_AA']
-    y_columns = ['weeklyDoseInRange']
+    genetics_values = {'CYP2C9_2' : {'*1/*1':1, '*1/*2':2, '*2/*2':3},
+                       'CYP2C9_3' : {'*1/*1':1, '*1/*3':2, '*3/*3':3},
+                       'VKORC1'   : {'G/G':1, 'G/A':2, 'A/A':3}}
+    columns = ['sex', 'age', 'inr', 'imc', 'cyp2c92', 'cyp2c93', 'vkorc1','dose']
 
-    x_columns_values = [[],[],[],[],[],[],[],[],[]]
-    y_columns_values = [[]]
+
+    columns_values = [[],[],[],[],[],[],[],[]]
 
     for p in patients:
         serializer = PatientSerializer(p)
@@ -65,48 +69,24 @@ def patients_dataframe(patients):
         
 
         if patient['sex'] == 'M':
-            x_columns_values[0].append(1)
+            columns_values[0].append(2)
         else:
-            x_columns_values[0].append(0)
+            columns_values[0].append(1)
         
-        x_columns_values[1].append(patient['age'])
-        x_columns_values[2].append(patient['initialINR'])
-        x_columns_values[3].append(patient['imc'])
-        y_columns_values[0].append(patient['weeklyDoseInRange'])
+        columns_values[1].append(patient['age'])
+        columns_values[2].append(patient['initialINR'])
+        columns_values[3].append(patient['imc'])
+        columns_values[7].append(patient['weeklyDoseInRange'])
 
-        if genetics['CYP2C9_2'] == '*1/*2':
-            x_columns_values[4].append(1)
-        else:
-            x_columns_values[4].append(0)
+        columns_values[4].append(genetics_values['CYP2C9_2'][genetics['CYP2C9_2']])
+        columns_values[5].append(genetics_values['CYP2C9_3'][genetics['CYP2C9_3']])
+        columns_values[6].append(genetics_values['VKORC1'][genetics['VKORC1']])
 
-        if genetics['CYP2C9_3'] == '*1/*3': 
-            x_columns_values[5].append(1)
-        else:
-            x_columns_values[5].append(0)
-
-        if genetics['CYP2C9_3'] == '*3/*3':
-            x_columns_values[6].append(1)
-        else:
-            x_columns_values[6].append(0)
         
-        if genetics['VKORC1'] == 'A/A':
-            x_columns_values[7].append(0)
-            x_columns_values[8].append(1)
-        elif genetics['VKORC1'] == 'G/A':
-            x_columns_values[7].append(1)
-            x_columns_values[8].append(0)
-        else:
-            x_columns_values[7].append(0)
-            x_columns_values[8].append(0)
-        
+    df = pd.DataFrame(columns_values, columns).T
+    df['logdose'] = np.log2(df['dose'])
 
-    X = pd.DataFrame(x_columns_values, x_columns).T
-    #X.columns = x_columns
-    Y = pd.DataFrame(y_columns_values, y_columns).T
-    #Y.columns = y_columns
-
-    #print(df)
-    return (X,Y)
+    return df
 
 # Create your views here.
 class PatientModelViewSet(viewsets.ModelViewSet):
@@ -260,14 +240,29 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
     def multivariable_regression(self, request, pk=None):
         patients = Patient.objects.filter(weeklyDoseInRange__gt=0)
 
-        (X, Y)= patients_dataframe(patients)
-        print (X)
+        df = patients_dataframe(patients)
+        print(df.head())
 
-        regr = linear_model.LinearRegression()
-        regr.fit(X, Y)
+        lm = sfm.OLS.from_formula(formula="logdose~C(sex)+age+inr+imc+C(cyp2c92)+C(cyp2c93)+C(vkorc1)", data=df).fit()
 
-        print('Intercept: \n', regr.intercept_)
-        print('Coefficients: \n', regr.coef_)
+        #print(lm.summary())
+        print(lm.params)
+        params = lm.params
+        response = {
+                    "p_0": params[0],
+                    "p_men": params[1],
+                    "p_age": params[7],
+                    "p_initialINR": params[8],
+                    "p_imc": params[9],
+                    "p_CYP2C9_12": params[2],
+                    "p_CYP2C9_13": params[3],
+                    "p_CYP2C9_33": params[4],
+                    "p_VKORC1_GA": params[5],
+                    "p_VKORC1_AA": params[6]
+                }
+
+        return Response(response, status=status.HTTP_200_OK)
+
         
 
 class BoxplotVizualitation(APIView):
