@@ -55,3 +55,4 @@ class LogWTDparameters(models.Model):
     p_CYP2C9_33 = models.FloatField(default=0)
     p_VKORC1_GA = models.FloatField(default=0)
     p_VKORC1_AA = models.FloatField(default=0)
+    r_squared = models.FloatField(default=0)

@@ -40,7 +40,7 @@ def calculate_dosis(data,params):
     VKORC1_AA = 1 if data['genetics']['VKORC1'] == 'A/A' else 0
     print(VKORC1_AA)
 
-    logWTD = params.p_0 + (params.p_men * men) - (age * params.p_age) - (initialINR * params.p_initialINR) + (imc * params.p_imc) - (CYP2C9_2_12 * params.p_CYP2C9_12) - (CYP2C9_3_13 * params.p_CYP2C9_13) - (CYP2C9_3_33 * params.p_CYP2C9_33) - (VKORC1_GA * params.p_VKORC1_GA) - (VKORC1_AA * params.p_VKORC1_AA)
+    logWTD = params.p_0 + (params.p_men * men) + (age * params.p_age) + (initialINR * params.p_initialINR) + (imc * params.p_imc) + (CYP2C9_2_12 * params.p_CYP2C9_12) + (CYP2C9_3_13 * params.p_CYP2C9_13) + (CYP2C9_3_33 * params.p_CYP2C9_33) + (VKORC1_GA * params.p_VKORC1_GA) + (VKORC1_AA * params.p_VKORC1_AA)
     print(logWTD)
         
     return np.exp(logWTD)
@@ -248,7 +248,7 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
         #print(lm.summary())
         print(lm.params)
         params = lm.params
-        response = {
+        parameters = {
                     "p_0": params[0],
                     "p_men": params[1],
                     "p_age": params[7],
@@ -258,10 +258,29 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
                     "p_CYP2C9_13": params[3],
                     "p_CYP2C9_33": params[4],
                     "p_VKORC1_GA": params[5],
-                    "p_VKORC1_AA": params[6]
+                    "p_VKORC1_AA": params[6],
+                    "r_squared" : lm.rsquared
                 }
 
-        return Response(response, status=status.HTTP_200_OK)
+        last_parameters = LogWTDparameters.objects.last()
+
+        if last_parameters.r_squared <= lm.rsquared:
+            self.serializer_class = LogWTDparametersSerializer
+            serializer = LogWTDparametersSerializer(data=parameters)
+
+            if serializer.is_valid():
+                serializer.save()
+                response = {
+                    'message' : 'Parametres updated Succesfully'
+                }
+                response['params'] = parameters
+                return Response(response, status=status.HTTP_200_OK)
+            return Response({'message' : 'Problem updating parameters'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+        response = {'message' : 'Parameters not updated because of r squared'}
+        response['params'] = parameters
+
+        return Response(response, status=status.HTTP_406_NOT_ACCEPTABLE)
 
         
 
