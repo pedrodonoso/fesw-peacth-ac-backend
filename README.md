@@ -223,4 +223,3 @@ This methos get information for distribution plots
 - Django, MongoDB
 - Heroku, MongoDB Atlas Database
 - React, PrimeReact, Apexcharts
-

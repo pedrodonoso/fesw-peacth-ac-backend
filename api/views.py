@@ -11,11 +11,14 @@ from api.models import *
 from api.serializers import *
 import numpy as np
 import pandas as pd
+import statsmodels.api as sfm
 import matplotlib.pyplot as plt
 from rest_framework.views import APIView
 from datetime import date
 import json
 from rest_framework import serializers as rest_serializers
+
+
 
 def calculate_dosis(data,params):
     age = data['age']
@@ -42,12 +45,82 @@ def calculate_dosis(data,params):
         
     return np.exp(logWTD)
 
+def make_data_frame(genetic, dosis):
+    df_g = pd.DataFrame(genetic)
+    df_d = pd.DataFrame(dosis, columns = ['dosis'])
+
+    df_genetics = pd.concat([df_d, df_g], axis=1)
+
+    return df_genetics
+
+def patients_dataframe(patients):
+    genetics_values = {'CYP2C9_2' : {'*1/*1':1, '*1/*2':2, '*2/*2':3},
+                       'CYP2C9_3' : {'*1/*1':1, '*1/*3':2, '*3/*3':3},
+                       'VKORC1'   : {'G/G':1, 'G/A':2, 'A/A':3}}
+    columns = ['sex', 'age', 'inr', 'imc', 'cyp2c92', 'cyp2c93', 'vkorc1','dose']
+
+
+    columns_values = [[],[],[],[],[],[],[],[]]
+
+    for p in patients:
+        serializer = PatientSerializer(p)
+        patient = serializer.data
+        genetics = json.loads(patient['genetics'])
+        
+
+        if patient['sex'] == 'M':
+            columns_values[0].append(2)
+        else:
+            columns_values[0].append(1)
+        
+        columns_values[1].append(patient['age'])
+        columns_values[2].append(patient['initialINR'])
+        columns_values[3].append(patient['imc'])
+        columns_values[7].append(patient['weeklyDoseInRange'])
+
+        columns_values[4].append(genetics_values['CYP2C9_2'][genetics['CYP2C9_2']])
+        columns_values[5].append(genetics_values['CYP2C9_3'][genetics['CYP2C9_3']])
+        columns_values[6].append(genetics_values['VKORC1'][genetics['VKORC1']])
+
+        
+    df = pd.DataFrame(columns_values, columns).T
+    df['logdose'] = np.log2(df['dose'])
+
+    return df
 
 # Create your views here.
 class PatientModelViewSet(viewsets.ModelViewSet):
     
     serializer_class = PatientSerializer
     queryset = Patient.objects.all()
+
+    def retrieve(self, request, pk=None):
+        try:
+            object = Patient.objects.get(code=pk)
+
+            serializer = self.get_serializer(object)
+
+            data = serializer.data
+            data['genetics'] = json.loads(data['genetics'])
+
+            return Response(data, status=status.HTTP_200_OK)
+        except:            
+            return Response({"message" : "Patient not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    def list(self, request):
+        try:
+            patientsObjects = Patient.objects.all()
+            serializer = self.get_serializer(patientsObjects, many=True)
+
+            patients = serializer.data
+
+            for p in patients:
+                p['genetics'] = json.loads(p['genetics'])
+
+            return Response(patients, status=status.HTTP_200_OK)
+        except:
+            return Response({"message" : "NULL"}, status=status.HTTP_404_NOT_FOUND)
+
         
 
     @action(detail=True, methods=['post'])
@@ -57,7 +130,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
 
         request_data = request.data
 
-        print(request_data['code'])
+        #print(request_data['code'])
 
         serializer = PatientSerializer(data=request_data)
         print(serializer.is_valid())
@@ -163,14 +236,32 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
         return Response(json.data, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['get'])
+    def multivariable_regression(self, request, pk=None):
+        patients = Patient.objects.filter(weeklyDoseInRange__gt=0)
 
-def make_data_frame(genetic, dosis):
-    df_g = pd.DataFrame(genetic)
-    df_d = pd.DataFrame(dosis, columns = ['dosis'])
+        df = patients_dataframe(patients)
+        print(df.head())
 
-    df_genetics = pd.concat([df_d, df_g], axis=1)
+        lm = sfm.OLS.from_formula(formula="logdose~C(sex)+age+inr+imc+C(cyp2c92)+C(cyp2c93)+C(vkorc1)", data=df).fit()
 
-    return df_genetics
+        #print(lm.summary())
+        print(lm.params)
+        params = lm.params
+        response = {
+                    "p_0": params[0],
+                    "p_men": params[1],
+                    "p_age": params[7],
+                    "p_initialINR": params[8],
+                    "p_imc": params[9],
+                    "p_CYP2C9_12": params[2],
+                    "p_CYP2C9_13": params[3],
+                    "p_CYP2C9_33": params[4],
+                    "p_VKORC1_GA": params[5],
+                    "p_VKORC1_AA": params[6]
+                }
+
+        return Response(response, status=status.HTTP_200_OK)
 
         
 
@@ -178,41 +269,55 @@ class BoxplotVizualitation(APIView):
 
     #@api_view(['GET'])
     #@schema(None)
-    def get(self,request,format=None):
+    def get(self,request,format=None,**kwargs):
         
         #Petición
-        x = 'CYP2C9_2'
-        y = '*1/*2'
+        x = kwargs['variable']
+        
 
-        genetic = [patient.genetics for patient in Patient.objects.all()]
-        dosis = [patient.weeklyDoseInRange for patient in Patient.objects.all()]
+        genetic = [patient.genetics for patient in Patient.objects.filter(weeklyDoseInRange__gt=0)]
+        dosis = [patient.weeklyDoseInRange for patient in Patient.objects.filter(weeklyDoseInRange__gt=0)]
 
         gens = make_data_frame(genetic, dosis)
 
-        fillter= gens[x] == y
-        gens_f = gens[fillter]
+        y = gens[x].unique()
 
-        #[min, Q1, Q2, Q3, max]
-        q1 = np.percentile(gens_f['dosis'],25)
-        q2 = np.percentile(gens_f['dosis'],50)
-        q3 = np.percentile(gens_f['dosis'],75)
-        mn = q1 - 1.5*(q3-q1)
-        mx = q3 + 1.5*(q3-q1)
+        print(y)
 
-        print(mn,q1,q2,q3,mx)
+        l= []
 
-        response = {
-                        y : [mn, q1, q2 ,q3, mx]
-                    }
+        for i in y:
+            aux = {}
+
+            fillter= gens[x] == i
+            gens_f = gens[fillter]
+
+            #[min, Q1, Q2, Q3, max]
+            q1 = np.percentile(gens_f['dosis'],25)
+            q2 = np.percentile(gens_f['dosis'],50)
+            q3 = np.percentile(gens_f['dosis'],75)
+            mn = q1 - 1.5*(q3-q1)
+            mx = q3 + 1.5*(q3-q1)
+
+            aux['label'] = i
+            aux['value'] = [mn, q1, q2 ,q3, mx]
+
+            l.append(aux)
+
+            print(mn,q1,q2,q3,mx)
+
+        response = l
 
         return Response(response, status=status.HTTP_200_OK)
 
 class FrequencyVizualitation(APIView):
     
-    def get(self,request,format=None):
+    def get(self,request, **kwargs):
+
+        print(kwargs['variable'])
 
         #Petición
-        x = 'CYP2C9_3'
+        x = kwargs['variable'] # 'CYP2C9_3'
 
         genetic = [patient.genetics for patient in Patient.objects.all()]
         dosis = [patient.weeklyDoseInRange for patient in Patient.objects.all()]
