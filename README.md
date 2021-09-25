@@ -64,6 +64,31 @@ This method calculate the dose of the patients
 	"initialDose": 8.543749816393767 
 	}
 	```
+
+#### Ver un paciente [GET]
+This method obtains the info of a pacient with a code
+- https://peacth-ac-backend.herokuapp.com/api/patients/{code}
++ Response
+    ```
+    {
+    		"code": "T-001",             
+    		"sex": "M",                  
+    		"initialDate": "2009-11-30", 
+    		"initialDose": 6.0,          
+    		"initialINR": 1.1,           
+    		"weeklyDoseInRange": 10.0,   
+    		"totalDays": 534, 	     
+    		"weight": 80.0, 	     
+    		"height": 1.68, 	     
+    		"imc": 28.3,                
+    		"age": 69,                   
+    		"genetics": {
+	    		"CYP2C9_2": "*1/*1", 
+    			"CYP2C9_3": "*1/*1", 
+    			"VKORC1": "A/A"      
+    		}
+    }
+
 ### Registra visitas
 #### Ver todos los controles registrados [GET]
 This method allows us to see all the information about medical checks.
