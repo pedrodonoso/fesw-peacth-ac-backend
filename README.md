@@ -126,7 +126,7 @@ This method save the information about patient's medical checks
 		"message": "Saved Succesfully"
 	}
 	```
-### Actualizar parámetros del algoritmo manualmente
+### Actualizar parámetros del algoritmo
 #### Actualizar parámetros de forma manual [POST]
 This method allow us change the current parameters of the pharmacogenetics algorithm
 - https://peacth-ac-backend.herokuapp.com/api/LogWTDparameters/set_parametres/set_parametres/
@@ -171,6 +171,28 @@ This method allow us change the current parameters of the pharmacogenetics algor
 		"p_VKORC1_AA": 0.701
 	}
 	```
+### Regresión lineal [GET]
+- https://peacth-ac-backend.herokuapp.com/api/LogWTDparameters/multivariable_regression/multivariable_regression/
++ Response (application/JSON)
+	```
+	{
+		"message": "Parameters not updated because of r squared",
+		"params": {
+			"p_0": 4.8519927925716475,
+			"p_men": 0.22211275448247525,
+			"p_age": -0.012814841488389746,
+			"p_initialINR": -0.0784394288974603,
+			"p_imc": 0.008287360486787231,
+			"p_CYP2C9_12": -0.17796969096743442,
+			"p_CYP2C9_13": -0.45815491317751467,
+			"p_CYP2C9_33": -1.1406527502812869,
+			"p_VKORC1_GA": -0.418752414756341,
+			"p_VKORC1_AA": -1.0545597169772143,
+			"r_squared": 0.5116452670520679
+		}
+	}
+	```
+
 ### Análisis comparativo de la dosis calculada entre genotipos ingresados
 + Parameters
 		+ gen (string) : the gene for which information is required
