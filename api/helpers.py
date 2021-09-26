@@ -76,22 +76,22 @@ def patients_dataframe(patients):
 
 def switch_CYP2C9(argument):
     switcher = {
-        "*1/*1-*1/*1": {'CYP2C9*2': 'Ausente'      ,'CYP2C9*3':'Ausente'      ,'resp':"El genotipo del paciente corresponde a un metabolizador extensivo o silvestre (EM)"},
-        "*1/*1-*1/*3": {'CYP2C9*2': 'Ausente'      ,'CYP2C9*3':'Heterocigoto' ,'resp':"El genotipo del paciente corresponde a un metabolizador intermedio (IM)"},
-        "*1/*1-*3/*3": {'CYP2C9*2': 'Heterocigoto' ,'CYP2C9*3':'Ausente'      ,'resp':"El genotipo del paciente corresponde a un metabolizador extensivo o silvestre (EM)"},
-        "*1/*2-*1/*1": {'CYP2C9*2': 'Heterocigoto' ,'CYP2C9*3':'Heterocigoto' ,'resp':"El genotipo del paciente corresponde a un metabolizador intermedio (IM)"},
-        "*1/*2-*1/*3": {'CYP2C9*2': 'Ausente'      ,'CYP2C9*3':'Doble mutado' ,'resp':"El genotipo del paciente corresponde a un metabolizador deficiente o pobre (PM)"},
-        "*1/*2-*3/*3": {'CYP2C9*2': 'Doble mutado' ,'CYP2C9*3':'Ausente'      ,'resp':"El genotipo del paciente corresponde a un metabolizador extensivo o silvestre (EM)"},
-        "*2/*2-*1/*1": {'CYP2C9*2': 'Doble mutado' ,'CYP2C9*3':'Doble mutado' ,'resp':"El genotipo del paciente corresponde a un metabolizador deficiente o pobre (PM)"},
-        "*2/*2-*1/*3": {'CYP2C9*2': 'Heterocigoto' ,'CYP2C9*3':'Doble mutado' ,'resp':"El genotipo del paciente corresponde a un metabolizador deficiente o pobre (PM)"},
-        "*2/*2-*3/*3": {'CYP2C9*2': 'Doble mutado' ,'CYP2C9*3':'Heterocigoto' ,'resp':"El genotipo del paciente corresponde a un metabolizador intermedio (IM)"}
+        "*1/*1-*1/*1": {'ID Polimorfismo estudiado': {'rs1799853 (*2)':'Ausente','rs1057910 (*3)':'Ausente'}           , 'Observaciones':"El genotipo del paciente corresponde a un metabolizador extensivo o silvestre (EM)"},
+        "*1/*1-*1/*3": {'ID Polimorfismo estudiado': {'rs1799853 (*2)':'Ausente','rs1057910 (*3)':'Heterocigoto'}      , 'Observaciones':"El genotipo del paciente corresponde a un metabolizador intermedio (IM)"},
+        "*1/*1-*3/*3": {'ID Polimorfismo estudiado': {'rs1799853 (*2)':'Heterocigoto','rs1057910 (*3)':'Ausente'}      ,'Observaciones':"El genotipo del paciente corresponde a un metabolizador extensivo o silvestre (EM)"},
+        "*1/*2-*1/*1": {'ID Polimorfismo estudiado': {'rs1799853 (*2)':'Heterocigoto','rs1057910 (*3)':'Heterocigoto'} ,'Observaciones':"El genotipo del paciente corresponde a un metabolizador intermedio (IM)"},
+        "*1/*2-*1/*3": {'ID Polimorfismo estudiado': {'rs1799853 (*2)':'Ausente','rs1057910 (*3)':'Doble mutado'}      ,'Observaciones':"El genotipo del paciente corresponde a un metabolizador deficiente o pobre (PM)"},
+        "*1/*2-*3/*3": {'ID Polimorfismo estudiado': {'rs1799853 (*2)':'Doble mutado','rs1057910 (*3)':'Ausente'}      ,'Observaciones':"El genotipo del paciente corresponde a un metabolizador extensivo o silvestre (EM)"},
+        "*2/*2-*1/*1": {'ID Polimorfismo estudiado': {'rs1799853 (*2)':'Doble mutado','rs1057910 (*3)':'Doble mutado'} ,'Observaciones':"El genotipo del paciente corresponde a un metabolizador deficiente o pobre (PM)"},
+        "*2/*2-*1/*3": {'ID Polimorfismo estudiado': {'rs1799853 (*2)':'Heterocigoto','rs1057910 (*3)':'Doble mutado'} ,'Observaciones':"El genotipo del paciente corresponde a un metabolizador deficiente o pobre (PM)"},
+        "*2/*2-*3/*3": {'ID Polimorfismo estudiado': {'rs1799853 (*2)':'Doble mutado','rs1057910 (*3)':'Heterocigoto'} ,'Observaciones':"El genotipo del paciente corresponde a un metabolizador intermedio (IM)"}
     }
-    return switcher.get(argument, "Invalid combination")
+    return {**{'Gen':'CYP2C9'},**switcher.get(argument, "Invalid combination")}
 
 def switch_VKORC1(argument):
     switcher = {
-        "G/G": {'Alelo': 'Ausente (G/G)'     ,   'resp':"El genotipo del paciente es normal"},
-        "G/A": {'Alelo': 'Heterocigoto (G/A)',   'resp':"El genotipo del paciente se relaciona con una menor dosis de Acenocumarol"},
-        "A/A": {'Alelo': 'Doble mutado (A/A)',   'resp':"El genotipo del paciente se relaciona con una menor dosis de Acenocumarol"},
+        "G/G": {'ID Polimorfismo estudiado': {'rs9923231':'Ausente (G/G)'}     , 'Observaciones':"El genotipo del paciente es normal"},
+        "G/A": {'ID Polimorfismo estudiado': {'rs9923231':'Heterocigoto (G/A)'}, 'Observaciones':"El genotipo del paciente se relaciona con una menor dosis de Acenocumarol"},
+        "A/A": {'ID Polimorfismo estudiado': {'rs9923231':'Doble mutado (A/A)'}, 'Observaciones':"El genotipo del paciente se relaciona con una menor dosis de Acenocumarol"},
     }
-    return switcher.get(argument, "Invalid combination")
+    return {**{'Gen':'VKORC1'},**switcher.get(argument, "Invalid combination")}
