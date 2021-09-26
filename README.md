@@ -102,8 +102,8 @@ This method obtains the info of a pacient with a code
 		"VKORC1": {
 			"Alelo": "Doble mutado (A/A)",
 			"resp": "El genotipo del paciente se relaciona con una menor dosis de Acenocumarol"
-    }
-}
+		}
+	}
 	```
 
 #### Perfil del paciente
