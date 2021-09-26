@@ -106,6 +106,44 @@ This method obtains the info of a pacient with a code
 }
 	```
 
+#### Perfil del paciente
+- https://peacth-ac-backend.herokuapp.com/api/patients/{code}/patient_profile/
++ Response (application JSON)
+	```
+	{
+		"clinic": {
+			"_id": "60f1ec92e7be8e6f7e378c14",
+			"code": "T-001",
+			"sex": "M",
+			"initialDate": "2009-11-30",
+			"initialDose": 6.0,
+			"initialINR": 1.1,
+			"weeklyDoseInRange": 10.0,
+			"totalDays": 534,
+			"weight": 80.0,
+			"height": 1.68,
+			"imc": 28.3,
+			"age": 69,
+			"genetics": {
+				"CYP2C9_2": "*1/*1",
+				"CYP2C9_3": "*1/*1",
+				"VKORC1": "A/A"
+			}
+		},
+		"genetic": {
+			"CYP2C9": {
+				"CYP2C9*2": "Ausente",
+				"CYP2C9*3": "Ausente",
+				"resp": "El genotipo del paciente corresponde a un metabolizador extensivo o silvestre (EM)"
+			},
+			"VKORC1": {
+				"Alelo": "Doble mutado (A/A)",
+				"resp": "El genotipo del paciente se relaciona con una menor dosis de Acenocumarol"
+			}
+		}
+	}
+	```
+
 ### Registra visitas
 #### Ver todos los controles registrados [GET]
 This method allows us to see all the information about medical checks.
