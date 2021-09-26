@@ -116,6 +116,38 @@ class PatientModelViewSet(viewsets.ModelViewSet):
         }
 
         return Response(response, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['get'])
+    def patient_profile(self, request, pk=None):
+        try:
+            object = Patient.objects.get(code=pk)
+
+            serializer = self.get_serializer(object)
+
+            response = {}
+            
+            patient = serializer.data
+            genetics = object.genetics
+            patient['genetics'] = json.loads(patient['genetics'])
+
+            response['clinic'] = patient
+
+            cyp2c9_comb = genetics['CYP2C9_2'] + "-" + genetics['CYP2C9_3']
+            vkorc1 = genetics['VKORC1']
+
+            cyp2c9_analysis = switch_CYP2C9(cyp2c9_comb)
+            vkorc1_analysis = switch_VKORC1(vkorc1)
+
+            gen_analysis = {
+                "CYP2C9": cyp2c9_analysis,
+                "VKORC1" : vkorc1_analysis
+            }
+
+            response['genetic'] = gen_analysis
+
+            return Response(response, status=status.HTTP_200_OK)
+        except:            
+            return Response({"message" : "Patient not found"}, status=status.HTTP_404_NOT_FOUND)
         
 
 class ClinicalControlViewSet(viewsets.ModelViewSet):   
