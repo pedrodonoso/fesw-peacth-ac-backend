@@ -89,6 +89,23 @@ This method obtains the info of a pacient with a code
     		}
     }
 
+#### Análisis Genético [GET] (Sujeto a Cambio)
+- https://peacth-ac-backend.herokuapp.com/api/patients/T-001/genetic_analysis/
++ Response (application JSON)
+	```
+	{
+		"CYP2C9": {
+			"CYP2C9*2": "Heterocigoto",
+			"CYP2C9*3": "Heterocigoto",
+			"resp": "El genotipo del paciente corresponde a un metabolizador intermedio (IM)"
+		},
+		"VKORC1": {
+			"Alelo": "Doble mutado (A/A)",
+			"resp": "El genotipo del paciente se relaciona con una menor dosis de Acenocumarol"
+    }
+}
+	```
+
 ### Registra visitas
 #### Ver todos los controles registrados [GET]
 This method allows us to see all the information about medical checks.
