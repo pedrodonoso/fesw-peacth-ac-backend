@@ -112,18 +112,18 @@ This method obtains the info of a pacient with a code
 	```
 	{
 		"clinic": {
-			"_id": "60f1ec92e7be8e6f7e378c14",
-			"code": "T-001",
+			"_id": "60f1ec92e7be8e6f7e378c16",
+			"code": "T-003",
 			"sex": "M",
-			"initialDate": "2009-11-30",
-			"initialDose": 6.0,
-			"initialINR": 1.1,
+			"initialDate": "2009-01-19",
+			"initialDose": 12.0,
+			"initialINR": 2.0,
 			"weeklyDoseInRange": 10.0,
-			"totalDays": 534,
-			"weight": 80.0,
-			"height": 1.68,
-			"imc": 28.3,
-			"age": 69,
+			"totalDays": 94,
+			"weight": 0.0,
+			"height": 0.0,
+			"imc": 0.0,
+			"age": 64,
 			"genetics": {
 				"CYP2C9_2": "*1/*1",
 				"CYP2C9_3": "*1/*1",
@@ -132,13 +132,13 @@ This method obtains the info of a pacient with a code
 		},
 		"genetic": {
 			"CYP2C9": {
-				"CYP2C9*2": "Ausente",
-				"CYP2C9*3": "Ausente",
-				"resp": "El genotipo del paciente corresponde a un metabolizador extensivo o silvestre (EM)"
+				"rs1799853": "Ausente",
+				"rs1057910": "Ausente",
+				"Observaciones": "El genotipo del paciente corresponde a un metabolizador extensivo o silvestre (EM)"
 			},
 			"VKORC1": {
-				"Alelo": "Doble mutado (A/A)",
-				"resp": "El genotipo del paciente se relaciona con una menor dosis de Acenocumarol"
+				"rs9923231": "Doble mutado (A/A)",
+				"Observaciones": "El genotipo del paciente se relaciona con una menor dosis de Acenocumarol"
 			}
 		}
 	}
