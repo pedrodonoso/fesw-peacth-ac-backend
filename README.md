@@ -227,11 +227,11 @@ This method allow us change the current parameters of the pharmacogenetics algor
 	}
 	```
 ### Regresión lineal [GET]
-- https://peacth-ac-backend.herokuapp.com/api/LogWTDparameters/multivariable_regression/multivariable_regression/
+- https://peacth-ac-backend.herokuapp.com/api/LogWTDparameters/multivariable_regression/
 + Response (application/JSON)
 	```
 	{
-		"message": "Parameters not updated because of r squared",
+		"message": "Los parámetros no se actualizaron debido a que el r2 es menor a la regresión actual",
 		"params": {
 			"p_0": 4.8519927925716475,
 			"p_men": 0.22211275448247525,
