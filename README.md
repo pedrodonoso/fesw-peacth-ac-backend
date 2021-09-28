@@ -31,11 +31,11 @@ python3 manage.py migrate
 # Documentación API
 
 ### API root
-- https://peacth-ac-backend.herokuapp.com/api/
+- https://peacth-ac-api.herokuapp.com/api/
 ### ESTIMACIÓN DE DOSIS
 #### Calcular dosis semanal [POST]
 This method calculate the dose of the patients
-- https://peacth-ac-backend.herokuapp.com/api/patients/get_weekly_dosis/get_weekly_dosis/
+- https://peacth-ac-api.herokuapp.com/api/patients/get_weekly_dosis/get_weekly_dosis/
 + Request (application/JSON)
 	+ Body
     ```
@@ -67,7 +67,7 @@ This method calculate the dose of the patients
 
 #### Ver un paciente [GET]
 This method obtains the info of a pacient with a code
-- https://peacth-ac-backend.herokuapp.com/api/patients/{code}
+- https://peacth-ac-api.herokuapp.com/api/patients/{code}
 + Response
     ```
     {
@@ -90,7 +90,7 @@ This method obtains the info of a pacient with a code
     }
 
 #### Análisis Genético [GET] (Sujeto a Cambio)
-- https://peacth-ac-backend.herokuapp.com/api/patients/T-001/genetic_analysis/
+- https://peacth-ac-api.herokuapp.com/api/patients/T-001/genetic_analysis/
 + Response (application JSON)
 	```
 	{
@@ -107,7 +107,7 @@ This method obtains the info of a pacient with a code
 	```
 
 #### Perfil del paciente
-- https://peacth-ac-backend.herokuapp.com/api/patients/{code}/patient_profile/
+- https://peacth-ac-api.herokuapp.com/api/patients/{code}/patient_profile/
 + Response (application JSON)
 	```
 	{
@@ -147,7 +147,7 @@ This method obtains the info of a pacient with a code
 ### Registra visitas
 #### Ver todos los controles registrados [GET]
 This method allows us to see all the information about medical checks.
-- https://peacth-ac-backend.herokuapp.com/api/clinical_control/
+- https://peacth-ac-api.herokuapp.com/api/clinical_control/
 + Response (application JSON)
 	```
 	{ 
@@ -162,7 +162,7 @@ This method allows us to see all the information about medical checks.
 	```
 #### Registrar visita [POST]
 This method save the information about patient's medical checks 
-- https://peacth-ac-backend.herokuapp.com/api/clinical_control/register_visit/register_visit/
+- https://peacth-ac-api.herokuapp.com/api/clinical_control/register_visit/register_visit/
 + Request (application/JSON)
 	+ Body
 		```
@@ -184,7 +184,7 @@ This method save the information about patient's medical checks
 ### Actualizar parámetros del algoritmo
 #### Actualizar parámetros de forma manual [POST]
 This method allow us change the current parameters of the pharmacogenetics algorithm
-- https://peacth-ac-backend.herokuapp.com/api/LogWTDparameters/set_parametres/set_parametres/
+- https://peacth-ac-api.herokuapp.com/api/LogWTDparameters/set_parametres/set_parametres/
 + Request (application/JSON)
 	+ Body
 		```
@@ -209,7 +209,7 @@ This method allow us change the current parameters of the pharmacogenetics algor
 	```
 #### Obtener la última actualización de los parámetros [GET]
 This method allow us change the current parameters of the pharmacogenetics algorithm
-- https://peacth-ac-backend.herokuapp.com/api/LogWTDparameters/get_last/get_last
+- https://peacth-ac-api.herokuapp.com/api/LogWTDparameters/get_last/get_last
 + Response (application/JSON)
 	```
 	{
@@ -227,7 +227,7 @@ This method allow us change the current parameters of the pharmacogenetics algor
 	}
 	```
 ### Regresión lineal [GET]
-- https://peacth-ac-backend.herokuapp.com/api/LogWTDparameters/multivariable_regression/
+- https://peacth-ac-api.herokuapp.com/api/LogWTDparameters/multivariable_regression/
 + Response (application/JSON)
 	```
 	{
@@ -254,7 +254,7 @@ This method allow us change the current parameters of the pharmacogenetics algor
 		+ gen (string) : the gene for which information is required
 #### Información boxplot [GET]
 This method get information needed to plot boxplot
-- https://peacth-ac-backend.herokuapp.com/api/distributions/boxplot/{gen}
+- https://peacth-ac-api.herokuapp.com/api/distributions/boxplot/{gen}
 + Response (application/JSON)
 	```
 	[
@@ -292,7 +292,7 @@ This method get information needed to plot boxplot
 	```
 #### Información distribución [GET]
 This methos get information for distribution plots
-- https://peacth-ac-backend.herokuapp.com/api/distributions/frequency/{gen}
+- https://peacth-ac-api.herokuapp.com/api/distributions/frequency/{gen}
 + Response (application/JSON)
 	```
 	{
