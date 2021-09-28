@@ -247,6 +247,7 @@ This method allow us change the current parameters of the pharmacogenetics algor
 		}
 	}
 	```
+	Si se actualizan los parámetros, se entregará un código 200, en caso contrario se entrega un 406.
 
 ### Análisis comparativo de la dosis calculada entre genotipos ingresados
 + Parameters
