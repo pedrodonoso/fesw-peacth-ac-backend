@@ -220,8 +220,8 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
         return Response(json.data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['get'])
-    def multivariable_regression(self, request, pk=None):
+    @action(detail=False, methods=['get'])
+    def multivariable_regression(self, request):
         patients = Patient.objects.filter(weeklyDoseInRange__gt=0)
 
         df = patients_dataframe(patients)
@@ -255,13 +255,13 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
             if serializer.is_valid():
                 serializer.save()
                 response = {
-                    'message' : 'Parametres updated Succesfully'
+                    'message' : 'Parámetros actualizados correctamente'
                 }
                 response['params'] = parameters
                 return Response(response, status=status.HTTP_200_OK)
             return Response({'message' : 'Problem updating parameters'}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-        response = {'message' : 'Parameters not updated because of r squared'}
+        response = {'message' : 'Los parámetros no se actualizaron debido a que el r2 es menor a la regresión actual'}
         response['params'] = parameters
 
         return Response(response, status=status.HTTP_406_NOT_ACCEPTABLE)
