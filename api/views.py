@@ -203,7 +203,7 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             serializer.save()
             response = {
-                'message' : 'Parametres updated Succesfully'
+                'message' : 'Parámetros actualizados correctamente'
             }
             return Response(response, status=status.HTTP_200_OK)
 
