@@ -264,7 +264,7 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
         response = {'message' : 'Los parámetros no se actualizaron debido a que el r2 es menor a la regresión actual'}
         response['params'] = LogWTDparametersSerializer(last_parameters).data
 
-        return Response(response, status=status.HTTP_406_NOT_ACCEPTABLE)
+        return Response(response, status=status.HTTP_200_OK)
 
         
 
