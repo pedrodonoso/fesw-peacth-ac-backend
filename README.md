@@ -198,7 +198,8 @@ This method allow us change the current parameters of the pharmacogenetics algor
 			"p_CYP2C9_13":  0.323,  
 			"p_CYP2C9_33":  0.746,  
 			"p_VKORC1_GA":  0.27,  
-			"p_VKORC1_AA":  0.701  
+			"p_VKORC1_AA":  0.701,
+			"r_squared": 0.5147  
 		}
 		```
 + Response (application/JSON)
@@ -223,7 +224,8 @@ This method allow us change the current parameters of the pharmacogenetics algor
 		"p_CYP2C9_13": 0.323,
 		"p_CYP2C9_33": 0.746,
 		"p_VKORC1_GA": 0.27,
-		"p_VKORC1_AA": 0.701
+		"p_VKORC1_AA": 0.701,
+		"r_squared": 0.5147
 	}
 	```
 ### Regresión lineal [GET]
@@ -247,7 +249,6 @@ This method allow us change the current parameters of the pharmacogenetics algor
 		}
 	}
 	```
-	Si se actualizan los parámetros, se entregará un código 200, en caso contrario se entrega un 406.
 
 ### Análisis comparativo de la dosis calculada entre genotipos ingresados
 + Parameters
