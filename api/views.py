@@ -248,7 +248,7 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
         last_parameters = LogWTDparameters.objects.last()
 
-        if last_parameters.r_squared <= lm.rsquared:
+        if last_parameters.r_squared < lm.rsquared:
             self.serializer_class = LogWTDparametersSerializer
             serializer = LogWTDparametersSerializer(data=parameters)
 
@@ -262,7 +262,7 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
             return Response({'message' : 'Problem updating parameters'}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
         response = {'message' : 'Los parámetros no se actualizaron debido a que el r2 es menor a la regresión actual'}
-        response['params'] = parameters
+        response['params'] = LogWTDparametersSerializer(last_parameters).data
 
         return Response(response, status=status.HTTP_406_NOT_ACCEPTABLE)
 
