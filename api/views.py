@@ -119,7 +119,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def patient_profile(self, request, pk=None):
-        #try:
+        try:
             object = Patient.objects.get(code=pk)
 
             serializer = self.get_serializer(object)
@@ -176,8 +176,8 @@ class PatientModelViewSet(viewsets.ModelViewSet):
             response["historicINR"] = historicINR
 
             return Response(response, status=status.HTTP_200_OK)
-        #except:            
-            #return Response({"message" : "Patient not found"}, status=status.HTTP_404_NOT_FOUND)
+        except:            
+            return Response({"message" : "Patient not found"}, status=status.HTTP_404_NOT_FOUND)
         
 
 class ClinicalControlViewSet(viewsets.ModelViewSet):   
