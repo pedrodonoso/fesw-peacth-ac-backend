@@ -141,6 +141,26 @@ This method obtains the info of a pacient with a code
 				"Observaciones": "El genotipo del paciente se relaciona con una menor dosis de Acenocumarol"
 			}
 		}
+		"historicINR": {
+			"dates": [
+				"30/11/2009",
+				"30/12/2009",
+				"30/01/2010",
+				"30/03/2010"
+			],
+			"inrValues": [
+				3.4,
+				3.7,
+				3.2,
+				3.0
+			],
+			"doseValues": [
+				0,
+				66.0,
+				50.0,
+				40.0
+			]
+		}
 	}
 	```
 
