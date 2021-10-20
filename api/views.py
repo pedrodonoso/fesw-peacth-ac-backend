@@ -119,19 +119,21 @@ class PatientModelViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def patient_profile(self, request, pk=None):
-        try:
+        #try:
             object = Patient.objects.get(code=pk)
 
             serializer = self.get_serializer(object)
 
             response = {}
             
+            # Clinic information
             patient = serializer.data
             genetics = object.genetics
             patient['genetics'] = json.loads(patient['genetics'])
 
             response['clinic'] = patient
 
+            # Genetic profile
             cyp2c9_comb = genetics['CYP2C9_2'] + "-" + genetics['CYP2C9_3']
             vkorc1 = genetics['VKORC1']
 
@@ -145,9 +147,37 @@ class PatientModelViewSet(viewsets.ModelViewSet):
 
             response['genetic'] = gen_analysis
 
+            # Treatement progress
+            visits = ClinicalControl.objects.filter(patientCode=pk)
+
+            first = True
+            
+            dates = []
+            inrValues = []
+            doseValues = []
+
+            for v in visits:
+                if first:
+                    dates.append(v.controlDate.strftime("%d/%m/%Y"))
+                    inrValues.append(v.arrivalINR)
+                    doseValues.append(0)
+                    first = False
+                else:
+                    dates.append(v.controlDate.strftime("%d/%m/%Y"))
+                    inrValues.append(v.arrivalINR)
+                    doseValues.append(v.arrivalDose)
+
+            historicINR = {
+                "dates" : dates,
+                "inrValues" : inrValues,
+                "doseValues" : doseValues
+            }
+
+            response["historicINR"] = historicINR
+
             return Response(response, status=status.HTTP_200_OK)
-        except:            
-            return Response({"message" : "Patient not found"}, status=status.HTTP_404_NOT_FOUND)
+        #except:            
+            #return Response({"message" : "Patient not found"}, status=status.HTTP_404_NOT_FOUND)
         
 
 class ClinicalControlViewSet(viewsets.ModelViewSet):   
