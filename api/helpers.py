@@ -39,7 +39,7 @@ def make_data_frame(genetic, dosis):
 
     return df_genetics
 
-def patients_dataframe(patients):
+def patients_dataframe(patients, RN = False):
     genetics_values = {'CYP2C9_2' : {'*1/*1':1, '*1/*2':2, '*2/*2':3},
                        'CYP2C9_3' : {'*1/*1':1, '*1/*3':2, '*3/*3':3},
                        'VKORC1'   : {'G/G':1, 'G/A':2, 'A/A':3}}
@@ -64,13 +64,20 @@ def patients_dataframe(patients):
         columns_values[3].append(patient['imc'])
         columns_values[7].append(patient['weeklyDoseInRange'])
 
-        columns_values[4].append(genetics_values['CYP2C9_2'][genetics['CYP2C9_2']])
-        columns_values[5].append(genetics_values['CYP2C9_3'][genetics['CYP2C9_3']])
-        columns_values[6].append(genetics_values['VKORC1'][genetics['VKORC1']])
-
+        if not RN:
+            columns_values[4].append(genetics_values['CYP2C9_2'][genetics['CYP2C9_2']])
+            columns_values[5].append(genetics_values['CYP2C9_3'][genetics['CYP2C9_3']])
+            columns_values[6].append(genetics_values['VKORC1'][genetics['VKORC1']])
+        else:
+            columns_values[4].append(p.genetics)
         
     df = pd.DataFrame(columns_values, columns).T
-    df['logdose'] = np.log2(df['dose'])
+
+    if RN:
+        df = df.drop(columns=['cyp2c93','vkorc1'])
+        df = df.rename(columns={'cyp2c92':'genetics'})
+    else:
+        df['logdose'] = np.log2(df['dose'])
 
     return df
 
@@ -95,3 +102,44 @@ def switch_VKORC1(argument):
         "A/A": {'rs9923231':'Doble mutado (A/A)', 'Observaciones':"El genotipo del paciente se relaciona con una menor dosis de Acenocumarol"},
     }
     return switcher.get(argument, "Invalid combination")
+
+def categorical_data_preprocessing(df):
+  #Variables genéticas
+  df['genetics'].values[0]
+  genetics = pd.DataFrame(list(df['genetics'].values))
+  gen_df = pd.get_dummies(genetics)
+
+  #Sexo
+  sex_df = pd.get_dummies(df['sex'], prefix='sex')
+
+  return pd.concat([sex_df,gen_df],axis=1) 
+
+def data_preprocessing(data):
+  '''
+  code                 BORRAR
+  sex                  CATEGORICO
+  initialDate          BORRAR
+  initialDose          NUMERICA
+  initialINR           NUMERICA
+  weeklyDoseInRange    PREDECIR
+  totalDays            BORRAR
+  weight               BORRAR
+  height               BORRAR
+  imc                  NUMERICA
+  age                  NUMERICA
+  genetics             CATEGORICO
+  '''
+  categorical_df = categorical_data_preprocessing(data)
+
+  #Crear nuevo dataframe
+  new_df = pd.concat([data,categorical_df],axis=1) 
+  y = new_df['dose']
+  new_df = new_df.drop(columns=['sex','genetics','dose'],axis=1)
+
+  return new_df, y
+
+def minmax_norm(df, min, max):
+  return (df- min) / (max - min)
+
+def r_minmax_norm(df, min, max):
+  return df*(max - min) + min

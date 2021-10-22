@@ -12,3 +12,6 @@ django-heroku==0.3.1
 gunicorn
 django-cors-headers
 statsmodels
+sklearn
+tensorflow
+keras

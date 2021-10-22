@@ -19,6 +19,27 @@ import json
 from rest_framework import serializers as rest_serializers
 from api.helpers import * 
 
+#RN
+import tensorflow as tf 
+from tensorflow.keras.callbacks import EarlyStopping
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import Callback, ModelCheckpoint
+from tensorflow.keras.layers import Dropout
+import tensorflow as tf 
+from keras import backend as k
+from tensorflow.keras import layers
+import keras
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Conv2D, MaxPool2D, Dropout, Input, concatenate, Flatten, InputLayer, LSTM
+from keras.utils.vis_utils import plot_model
+from keras.callbacks import ModelCheckpoint
+from keras import Model
+
 
 # Create your views here.
 class PatientModelViewSet(viewsets.ModelViewSet):
@@ -296,6 +317,59 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
         return Response(response, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['get'])
+    def neural_network(self, request):
+        patients = Patient.objects.filter(weeklyDoseInRange__gt=0)
+        data = patients_dataframe(patients, True)
+
+        X, y  = data_preprocessing(data)
+
+        #normalizar
+        X_min = X.min()
+        X_max = X.max()
+        y_min = y.min()
+        y_max = y.max()
+
+        y_norm = minmax_norm(y, y_min, y_max)
+        X_norm = minmax_norm(X, X_min, X_max)
+
+        X_train, X_test, y_train, y_test = train_test_split(X_norm, y_norm, test_size = 0.3, random_state=0)
+
+        X_train = X_train.astype('float64')
+        y_train = y_train.astype('float64')
+        X_test  = X_test.astype('float64')
+        y_test  = y_test.astype('float64')
+
+        model = tf.keras.Sequential()
+        model.add(layers.Input(shape=(13,)))
+        model.add(layers.Dense(128, activation="tanh", name='hidden'))
+        model.add(layers.Dropout(0.2))
+        model.add(layers.Dense(64, activation="tanh", name='hidden2'))
+        model.add(layers.Dropout(0.2))
+        model.add(layers.Dense(32, activation="tanh", name='hidden3'))
+        model.add(layers.Dropout(0.2))
+        model.add(layers.Dense(1, activation="sigmoid", name='output'))
+
+        model.compile(loss=tf.keras.losses.mean_absolute_error, optimizer='Adam', metrics=['accuracy'])
+        #print(model.summary())
+
+        cb = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=25)
+
+        history = model.fit(X_train, 
+                            y_train,
+                            validation_data=(X_test, y_test),
+                            batch_size=32,
+                            epochs=100, 
+                            verbose=1,
+                            callbacks=[cb])
+
+        a = X_norm.astype('float64').head(5)
+
+        w = model.predict(a)
+
+        print(r_minmax_norm(w, y_min, y_max))
+
+        return Response({},status=status.HTTP_200_OK)
         
 
 class BoxplotVizualitation(APIView):
