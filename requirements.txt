@@ -14,3 +14,4 @@ statsmodels
 sklearn
 tensorflow
 keras
+pickle-mixin

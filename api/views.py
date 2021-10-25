@@ -19,27 +19,8 @@ from rest_framework import serializers as rest_serializers
 from api.helpers import * 
 import pymongo
 from pymongo import MongoClient
-
-#RN
-import tensorflow as tf 
-from tensorflow.keras.callbacks import EarlyStopping
-from sklearn.model_selection import train_test_split
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Activation
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import Callback, ModelCheckpoint
-from tensorflow.keras.layers import Dropout
-import tensorflow as tf 
-from keras import backend as k
-from tensorflow.keras import layers
-import keras
-from sklearn.model_selection import train_test_split
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Conv2D, MaxPool2D, Dropout, Input, concatenate, Flatten, InputLayer, LSTM
-from keras.utils.vis_utils import plot_model
-from keras.callbacks import ModelCheckpoint
-from keras import Model
+from bson.binary import Binary
+import pickle
 
 client = MongoClient('mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/peacth-ac?retryWrites=true&w=majority')
 db = client['peacth-ac']
@@ -450,8 +431,13 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
         network_weights = model.get_weights()
 
-        #print(network_weights)
+        binary = Binary(pickle.dumps(network_weights, protocol=2), subtype=128 )
 
+        arrx = pickle.loads(binary)
+
+        for i in range(len(network_weights)):        
+            print(np.array_equal(network_weights[i], arrx[i]))
+            
         #print(r_minmax_norm(w, y_min, y_max))
 
         return Response({"message" : "Red neuronal actualizada."},status=status.HTTP_200_OK)
