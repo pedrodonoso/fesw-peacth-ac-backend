@@ -12,7 +12,6 @@ from api.serializers import *
 import numpy as np
 import pandas as pd
 import statsmodels.api as sfm
-import matplotlib.pyplot as plt
 from rest_framework.views import APIView
 from datetime import date
 import json
