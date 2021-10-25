@@ -6,6 +6,32 @@ import json
 from api.models import *
 from api.serializers import *
 
+#RN
+import tensorflow as tf 
+from tensorflow.keras.callbacks import EarlyStopping
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import Callback, ModelCheckpoint
+from tensorflow.keras.layers import Dropout
+import tensorflow as tf 
+from keras import backend as k
+from tensorflow.keras import layers
+import keras
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Conv2D, MaxPool2D, Dropout, Input, concatenate, Flatten, InputLayer, LSTM
+from keras.utils.vis_utils import plot_model
+from keras.callbacks import ModelCheckpoint
+from keras import Model
+
+
+network_weights = []
+
+
+
 def calculate_dosis(data,params):
     age = data['age']
     print(age)
@@ -30,6 +56,7 @@ def calculate_dosis(data,params):
     print(logWTD)
         
     return np.exp(logWTD)
+
 
 def make_data_frame(genetic, dosis):
     df_g = pd.DataFrame(genetic)
@@ -114,7 +141,7 @@ def categorical_data_preprocessing(df):
 
   return pd.concat([sex_df,gen_df],axis=1) 
 
-def data_preprocessing(data):
+def data_preprocessing(data, prediction=False):
   '''
   code                 BORRAR
   sex                  CATEGORICO
@@ -132,10 +159,13 @@ def data_preprocessing(data):
   categorical_df = categorical_data_preprocessing(data)
 
   #Crear nuevo dataframe
-  new_df = pd.concat([data,categorical_df],axis=1) 
-  y = new_df['dose']
+  new_df = pd.concat([data,categorical_df],axis=1)
+  y = []
+  if not prediction: 
+    y = new_df['dose']
   new_df = new_df.drop(columns=['sex','genetics','dose'],axis=1)
 
+  
   return new_df, y
 
 def minmax_norm(df, min, max):
@@ -143,3 +173,33 @@ def minmax_norm(df, min, max):
 
 def r_minmax_norm(df, min, max):
   return df*(max - min) + min
+
+def predict_dose(model, patient, X_min_max, y_min_max):
+    
+    df = patients_dataframe([patient], True)
+    X, _ = data_preprocessing(df, True)
+
+    #print(df.dtypes)
+    #print(df)
+
+    #print(X)
+
+    X_norm = minmax_norm(X, X_min_max[0], X_min_max[1])
+
+    print(type(X_norm))
+
+    X_norm = X_norm.fillna(0)
+    X_norm = X_norm.astype('float64')
+    
+
+    print(X_norm)
+
+    networkDoseNorm = model.predict(X_norm)
+
+    print(networkDoseNorm)
+
+    networkDose = r_minmax_norm(networkDoseNorm, y_min_max[0], y_min_max[1])
+
+    print(networkDose)
+
+    return networkDose[0][0]

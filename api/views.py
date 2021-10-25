@@ -41,6 +41,9 @@ from keras.callbacks import ModelCheckpoint
 from keras import Model
 
 
+y_min_max = []
+X_min_max = []
+
 # Create your views here.
 class PatientModelViewSet(viewsets.ModelViewSet):
     
@@ -76,7 +79,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
 
         
 
-    @action(detail=True, methods=['post'])
+    @action(detail=False, methods=['post'])
     def get_weekly_dosis(self, request, pk=None):
 
         self.serializer_class = PatientSerializer
@@ -86,17 +89,45 @@ class PatientModelViewSet(viewsets.ModelViewSet):
         #print(request_data['code'])
 
         serializer = PatientSerializer(data=request_data)
-        print(serializer.is_valid())
+        #print(X_min_max)
+        #print(serializer.is_valid())
 
         if serializer.is_valid():
+
+            #print(network_weights)
+            
+            serializer.save()
+
+            patient = Patient.objects.get(code=request_data['code'])
+
             param = LogWTDparameters.objects.last()
 
-            initialDose = calculate_dosis(request_data, param)
-            
-            request_data['initialDose'] = initialDose
+            model = tf.keras.Sequential()
+            model.add(layers.Input(shape=(13,)))
+            model.add(layers.Dense(128, activation="tanh", name='hidden'))
+            model.add(layers.Dropout(0.2))
+            model.add(layers.Dense(64, activation="tanh", name='hidden2'))
+            model.add(layers.Dropout(0.2))
+            model.add(layers.Dense(32, activation="tanh", name='hidden3'))
+            model.add(layers.Dropout(0.2))
+            model.add(layers.Dense(1, activation="sigmoid", name='output'))
 
-            serializer = PatientSerializer(data=request_data)
+            model.compile(loss=tf.keras.losses.mean_absolute_error, optimizer='Adam', metrics=['accuracy'])
+
+            model.set_weights(network_weights)
+
+            networkDose = predict_dose(model, patient, X_min_max, y_min_max)
+
+            print(networkDose)
+
+            regressionDose = calculate_dosis(request_data, param)
+            
+            
+
+            
+            '''
             if serializer.is_valid():
+                
                 initial_control = {
                     'patientCode' : request_data['code'],
                     'controlDate' : request_data['initialDate'],
@@ -113,10 +144,47 @@ class PatientModelViewSet(viewsets.ModelViewSet):
                     response = {
                         'initialDose' : initialDose
                     }
+                '''
 
-                    return Response(response, status=status.HTTP_200_OK)
+            response = {
+                    'regressionDose' : regressionDose,
+                    'networkDose' : networkDose
+                }
+            return Response(response, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'])
+    def set_dose(self, request, pk=None):
+
+        updated_pacient = request.data
+
+        patient = Patient.objects.get(code = updated_pacient["code"])
+
+        updated_pacient["_id"] = patient._id
+
+        serializer = PatientSerializer(patient, data=updated_pacient)
+
+        if serializer.is_valid():
+            
+
+            initial_control = {
+                    'patientCode' : updated_pacient['code'],
+                    'controlDate' : updated_pacient['initialDate'],
+                    'arrivalDose' : 0,
+                    'updatedDose': updated_pacient['initialDose'],
+                    'arrivalINR': updated_pacient['initialINR'],
+                    'inrInRange': False
+                }
+
+            control_serializer = ClinicalControlSerializer(data=initial_control)
+            if control_serializer.is_valid():
+                control_serializer.save()
+                serializer.save()
+                response = {
+                    'initialDose' : updated_pacient['initialDose']
+                }
+                return Response(response, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def genetic_analysis(self, request, pk=None):
@@ -330,6 +398,14 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
         y_min = y.min()
         y_max = y.max()
 
+        global y_min_max
+        global X_min_max
+
+        y_min_max = [y_min, y_max]
+        X_min_max = [X_min, X_max]
+
+        print(X_min_max)
+
         y_norm = minmax_norm(y, y_min, y_max)
         X_norm = minmax_norm(X, X_min, X_max)
 
@@ -363,13 +439,19 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
                             verbose=1,
                             callbacks=[cb])
 
-        a = X_norm.astype('float64').head(5)
+        #a = X_norm.astype('float64').head(5)
 
-        w = model.predict(a)
+        #w = model.predict(a)
 
-        print(r_minmax_norm(w, y_min, y_max))
+        global network_weights
 
-        return Response({},status=status.HTTP_200_OK)
+        network_weights = model.get_weights()
+
+        #print(network_weights)
+
+        #print(r_minmax_norm(w, y_min, y_max))
+
+        return Response({"message" : "Red neuronal actualizada."},status=status.HTTP_200_OK)
         
 
 class BoxplotVizualitation(APIView):
