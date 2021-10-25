@@ -76,9 +76,15 @@ def patients_dataframe(patients, RN = False):
     columns_values = [[],[],[],[],[],[],[],[]]
 
     for p in patients:
-        serializer = PatientSerializer(p)
-        patient = serializer.data
-        genetics = json.loads(patient['genetics'])
+        patient = {}
+        genetics = {}
+        if len(patients) > 1:
+            serializer = PatientSerializer(p)
+            patient = serializer.data
+            genetics = json.loads(patient['genetics'])
+        else:
+            patient = p
+            genetics = p['genetics']
         
 
         if patient['sex'] == 'M':
@@ -96,7 +102,7 @@ def patients_dataframe(patients, RN = False):
             columns_values[5].append(genetics_values['CYP2C9_3'][genetics['CYP2C9_3']])
             columns_values[6].append(genetics_values['VKORC1'][genetics['VKORC1']])
         else:
-            columns_values[4].append(p.genetics)
+            columns_values[4].append(genetics)
         
     df = pd.DataFrame(columns_values, columns).T
 

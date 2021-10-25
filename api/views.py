@@ -17,6 +17,8 @@ from datetime import date
 import json
 from rest_framework import serializers as rest_serializers
 from api.helpers import * 
+import pymongo
+from pymongo import MongoClient
 
 #RN
 import tensorflow as tf 
@@ -39,9 +41,14 @@ from keras.utils.vis_utils import plot_model
 from keras.callbacks import ModelCheckpoint
 from keras import Model
 
+client = MongoClient('mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/peacth-ac?retryWrites=true&w=majority')
+db = client['peacth-ac']
+
 
 y_min_max = []
 X_min_max = []
+
+
 
 # Create your views here.
 class PatientModelViewSet(viewsets.ModelViewSet):
@@ -95,9 +102,10 @@ class PatientModelViewSet(viewsets.ModelViewSet):
 
             #print(network_weights)
             
-            serializer.save()
+            #serializer.save()
 
-            patient = Patient.objects.get(code=request_data['code'])
+            #patient = Patient.objects.get(code=request_data['code'])
+            print(request_data)
 
             param = LogWTDparameters.objects.last()
 
@@ -115,7 +123,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
 
             model.set_weights(network_weights)
 
-            networkDose = predict_dose(model, patient, X_min_max, y_min_max)
+            networkDose = predict_dose(model, request_data, X_min_max, y_min_max)
 
             print(networkDose)
 
@@ -156,23 +164,19 @@ class PatientModelViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def set_dose(self, request, pk=None):
 
-        updated_pacient = request.data
+        pacient = request.data
 
-        patient = Patient.objects.get(code = updated_pacient["code"])
-
-        updated_pacient["_id"] = patient._id
-
-        serializer = PatientSerializer(patient, data=updated_pacient)
+        serializer = PatientSerializer(data=pacient)
 
         if serializer.is_valid():
             
 
             initial_control = {
-                    'patientCode' : updated_pacient['code'],
-                    'controlDate' : updated_pacient['initialDate'],
+                    'patientCode' : pacient['code'],
+                    'controlDate' : pacient['initialDate'],
                     'arrivalDose' : 0,
-                    'updatedDose': updated_pacient['initialDose'],
-                    'arrivalINR': updated_pacient['initialINR'],
+                    'updatedDose': pacient['initialDose'],
+                    'arrivalINR': pacient['initialINR'],
                     'inrInRange': False
                 }
 
@@ -181,7 +185,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
                 control_serializer.save()
                 serializer.save()
                 response = {
-                    'initialDose' : updated_pacient['initialDose']
+                    'initialDose' : pacient['initialDose']
                 }
                 return Response(response, status=status.HTTP_200_OK)
 
