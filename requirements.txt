@@ -3,7 +3,7 @@ djangorestframework==3.12.4
 django-filter==2.4.0
 sqlparse==0.2.4
 djongo==1.3.6
-numpy
+numpy==1.19.2
 pandas
 matplotlib
 dnspython
