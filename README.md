@@ -34,8 +34,8 @@ python3 manage.py migrate
 - https://peacth-ac-api.herokuapp.com/api/
 ### ESTIMACIÓN DE DOSIS
 #### Calcular dosis semanal [POST]
-This method calculate the dose of the patients
-- https://peacth-ac-api.herokuapp.com/api/patients/get_weekly_dosis/get_weekly_dosis/
+This method calculate the dose of the patients, but it doesn't save the patient in the database
+- https://peacth-ac-api.herokuapp.com/api/patients/get_weekly_dosis/
 + Request (application/JSON)
 	+ Body
     ```
@@ -43,9 +43,9 @@ This method calculate the dose of the patients
     		"code": "T-001",             
     		"sex": "M",                  
     		"initialDate": "2009-11-30", 
-    		"initialDose": 6.0,          
+    		"initialDose": 0,  # Always 0        
     		"initialINR": 1.1,           
-    		"weeklyDoseInRange": 10.0,   
+    		"weeklyDoseInRange": 0, # Always 0   
     		"totalDays": 534, 	     
     		"weight": 80.0, 	     
     		"height": 1.68, 	     
@@ -61,7 +61,39 @@ This method calculate the dose of the patients
 + Response (application/JSON)
 	```
 	{
-	"initialDose": 8.543749816393767 
+    "regressionDose": 5.742530690407449,
+    "networkDose": 5.193664073944092
+	}
+	```
+#### Fijar dosis [POST]
+This method set the dose of the patients and saves it to the database
+- https://peacth-ac-api.herokuapp.com/api/patients/set_dose/
++ Request (application/JSON)
+	+ Body
+    ```
+    {
+    		"code": "T-001",             
+    		"sex": "M",                  
+    		"initialDate": "2009-11-30", 
+    		"initialDose": 6.0,   # With the chosen dose       
+    		"initialINR": 1.1,           
+    		"weeklyDoseInRange": 0,   # Always 0 
+    		"totalDays": 534, 	     
+    		"weight": 80.0, 	     
+    		"height": 1.68, 	     
+    		"imc": 28.3,                
+    		"age": 69,                   
+    		"genetics": {
+				"CYP2C9_2": "*1/*1", 
+    			"CYP2C9_3": "*1/*1", 
+    			"VKORC1": "A/A"      
+    		}
+    }
+	```
++ Response (application/JSON)
+	```
+	{
+    "initialDose": 5.742530690407449
 	}
 	```
 
@@ -329,7 +361,16 @@ This methos get information for distribution plots
 		]
 	}
 	```
-
+### Red neuronal
+#### Entrenar Red Neuronal [GET]
+This method trains the neural network
+- https://peacth-ac-api.herokuapp.com/api/LogWTDparameters/neural_network
++ Response (application/JSON)
+	```
+	{
+    "message": "Red neuronal actualizada."
+	}
+	```
 <div id='ayudas' />
 
 # Ayudas
