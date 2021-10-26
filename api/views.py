@@ -400,9 +400,9 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
         if last:
             if last['numberOfPatients'] == len(patients):
-                return Response({"message" : "No hay cambios en la cantidad de pacientes. No se puede actualizar"},status=status.HTTP_200_OK)
+                return Response({"message" : "No hay cambios en la cantidad de pacientes. No se puede actualizar."},status=status.HTTP_200_OK)
             if len(patients) - last['numberOfPatients'] < 50:
-                return Response({"message" : "No hay pacientes nuevos suficientes. No se puede actualizar"},status=status.HTTP_200_OK)
+                return Response({"message" : "No hay pacientes nuevos suficientes. No se puede actualizar."},status=status.HTTP_200_OK)
             
             
 
