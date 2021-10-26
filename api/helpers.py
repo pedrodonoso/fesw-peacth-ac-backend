@@ -28,7 +28,7 @@ from keras.callbacks import ModelCheckpoint
 from keras import Model
 
 
-network_weights = []
+#network_weights = []
 
 
 

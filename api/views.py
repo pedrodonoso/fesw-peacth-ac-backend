@@ -1,3 +1,4 @@
+from typing import Collection
 from PeacthAC.settings import DATABASES
 from rest_framework import response
 from rest_framework.serializers import Serializer
@@ -13,7 +14,7 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sfm
 from rest_framework.views import APIView
-from datetime import date
+import datetime
 import json
 from rest_framework import serializers as rest_serializers
 from api.helpers import * 
@@ -26,8 +27,8 @@ client = MongoClient('mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mong
 db = client['peacth-ac']
 
 
-y_min_max = []
-X_min_max = []
+#y_min_max = []
+#X_min_max = []
 
 
 
@@ -89,6 +90,12 @@ class PatientModelViewSet(viewsets.ModelViewSet):
             print(request_data)
 
             param = LogWTDparameters.objects.last()
+
+            network_model = db['api_network_models'].find_one({}, sort=[( '_id', pymongo.DESCENDING )])
+
+            network_weights = pickle.loads(network_model['weights'])
+            y_min_max = pickle.loads(network_model['y_min_max'])
+            X_min_max = pickle.loads(network_model['X_min_max'])
 
             model = tf.keras.Sequential()
             model.add(layers.Input(shape=(13,)))
@@ -371,7 +378,34 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def neural_network(self, request):
+
+        '''
+        {   
+            "_id": ObjectID,
+            "weights" : binary,
+            "y_min_max": list,
+            "X_min_max": list,
+            "numberOfPatients": int,
+            "created_at": date,
+        }
+        '''
+
+        last = {}
+        network_collection = db['api_network_models']
+        if (not (network_collection.count() == 0 or 'network_models' in db.list_collection_names())):
+            last = network_collection.find_one({}, sort=[( '_id', pymongo.DESCENDING )])
+        
+
         patients = Patient.objects.filter(weeklyDoseInRange__gt=0)
+
+        if last:
+            if last['numberOfPatients'] == len(patients):
+                return Response({"message" : "No hay cambios en la cantidad de pacientes. No se puede actualizar"},status=status.HTTP_200_OK)
+            if len(patients) - last['numberOfPatients'] < 50:
+                return Response({"message" : "No hay pacientes nuevos suficientes. No se puede actualizar"},status=status.HTTP_200_OK)
+            
+            
+
         data = patients_dataframe(patients, True)
 
         X, y  = data_preprocessing(data)
@@ -382,8 +416,8 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
         y_min = y.min()
         y_max = y.max()
 
-        global y_min_max
-        global X_min_max
+        #global y_min_max
+        #global X_min_max
 
         y_min_max = [y_min, y_max]
         X_min_max = [X_min, X_max]
@@ -427,17 +461,33 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
         #w = model.predict(a)
 
-        global network_weights
-
         network_weights = model.get_weights()
 
-        binary = Binary(pickle.dumps(network_weights, protocol=2), subtype=128 )
+        weights_bin = Binary(pickle.dumps(network_weights, protocol=2), subtype=128 )
+        y_min_max_bin = Binary(pickle.dumps(y_min_max, protocol=2), subtype=128 )
+        X_min_max_bin = Binary(pickle.dumps(X_min_max, protocol=2), subtype=128 )
 
-        arrx = pickle.loads(binary)
+        #dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 
-        for i in range(len(network_weights)):        
-            print(np.array_equal(network_weights[i], arrx[i]))
-            
+        doc = {   
+                "weights" : weights_bin,
+                "y_min_max": y_min_max_bin,
+                "X_min_max": X_min_max_bin,
+                "numberOfPatients": len(patients),
+                "created_at": datetime.datetime.now()
+            }
+        
+        network_id = network_collection.insert_one(doc).inserted_id
+
+        print("Document with " + network_id + " saved successfully.")
+
+        #arrx = pickle.loads(binary)
+
+        #for i in range(len(network_weights)):        
+        #    print(np.array_equal(network_weights[i], arrx[i]))
+
+
+
         #print(r_minmax_norm(w, y_min, y_max))
 
         return Response({"message" : "Red neuronal actualizada."},status=status.HTTP_200_OK)
