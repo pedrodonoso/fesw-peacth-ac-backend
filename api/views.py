@@ -403,7 +403,7 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
                 return Response({"message" : "No hay cambios en la cantidad de pacientes. No se puede actualizar."},status=status.HTTP_200_OK)
             if len(patients) - last['numberOfPatients'] < 50:
                 return Response({"message" : "No hay pacientes nuevos suficientes. No se puede actualizar."},status=status.HTTP_200_OK)
-            
+  
             
 
         data = patients_dataframe(patients, True)
@@ -462,6 +462,7 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
         #w = model.predict(a)
 
         network_weights = model.get_weights()
+        print(history.history['val_accuracy'][-1])
 
         weights_bin = Binary(pickle.dumps(network_weights, protocol=2), subtype=128 )
         y_min_max_bin = Binary(pickle.dumps(y_min_max, protocol=2), subtype=128 )
@@ -469,7 +470,9 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
         #dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 
-        doc = {   
+        doc = {
+                "accuracy":history.history['val_accuracy'][-1],
+                "loss": history.history['val_loss'][-1],   
                 "weights" : weights_bin,
                 "y_min_max": y_min_max_bin,
                 "X_min_max": X_min_max_bin,
@@ -479,7 +482,7 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
         
         network_id = network_collection.insert_one(doc).inserted_id
 
-        print("Document with " + network_id + " saved successfully.")
+        print("Document with " + str(network_id) + " saved successfully.")
 
         #arrx = pickle.loads(binary)
 
