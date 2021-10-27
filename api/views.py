@@ -398,11 +398,17 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
         patients = Patient.objects.filter(weeklyDoseInRange__gt=0)
 
+        response = {
+            "is_updated" : False
+        }
+
         if last:
             if last['numberOfPatients'] == len(patients):
-                return Response({"message" : "No hay cambios en la cantidad de pacientes. No se puede actualizar."},status=status.HTTP_200_OK)
+                response["message"] = "No hay cambios en la cantidad de pacientes. No se puede actualizar."
+                return Response(response,status=status.HTTP_200_OK)
             if len(patients) - last['numberOfPatients'] < 50:
-                return Response({"message" : "No hay pacientes nuevos suficientes. No se puede actualizar."},status=status.HTTP_200_OK)
+                response["message"] = "No hay pacientes nuevos suficientes. No se puede actualizar."
+                return Response(response,status=status.HTTP_200_OK)
   
             
 
@@ -468,16 +474,17 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
         y_min_max_bin = Binary(pickle.dumps(y_min_max, protocol=2), subtype=128 )
         X_min_max_bin = Binary(pickle.dumps(X_min_max, protocol=2), subtype=128 )
 
-        #dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+
+        date = datetime.datetime.now()
+        dt_string = date.strftime("%d/%m/%Y %H:%M:%S")
 
         doc = {
-                "accuracy":history.history['val_accuracy'][-1],
                 "loss": history.history['val_loss'][-1],   
                 "weights" : weights_bin,
                 "y_min_max": y_min_max_bin,
                 "X_min_max": X_min_max_bin,
                 "numberOfPatients": len(patients),
-                "created_at": datetime.datetime.now()
+                "created_at": date
             }
         
         network_id = network_collection.insert_one(doc).inserted_id
@@ -493,8 +500,29 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
         #print(r_minmax_norm(w, y_min, y_max))
 
-        return Response({"message" : "Red neuronal actualizada."},status=status.HTTP_200_OK)
+        response = {
+            "is_updated" : True,
+            "message" : "Red neuronal actualizada.",
+            "loss" : history.history['loss'][-1],
+            "updated_at" : dt_string
+        }
+
+        return Response(response,status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def get_last_neural_network(self, request):
+
+        last_nn = db['api_network_models'].find_one({}, sort=[( '_id', pymongo.DESCENDING )])
+
+        print(type(last_nn["created_at"]))
+
+        response = {
+            "accuracy" : last_nn["accuracy"],
+            "loss" : last_nn["loss"],
+            "updated_at" : last_nn["created_at"].strftime("%d/%m/%Y %H:%M:%S")
+        }
         
+        return Response(response,status=status.HTTP_200_OK)
 
 class BoxplotVizualitation(APIView):
 
