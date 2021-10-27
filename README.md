@@ -377,7 +377,7 @@ This method trains the neural network
 + Response (application/JSON)
 	```
 	{
-    	"loss": 0.09884573519229889,
+    	"loss": "9.88%",
     	"created_at": "27/10/2021 01:16:50"
 	}
 	```
