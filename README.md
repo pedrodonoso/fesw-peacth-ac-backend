@@ -31,11 +31,11 @@ python3 manage.py migrate
 # Documentación API
 
 ### API root
-- https://peacth-ac-api.herokuapp.com/api/
+- http://3.143.234.136:8000/api/
 ### ESTIMACIÓN DE DOSIS
 #### Calcular dosis semanal [POST]
 This method calculate the dose of the patients, but it doesn't save the patient in the database
-- https://peacth-ac-api.herokuapp.com/api/patients/get_weekly_dosis/
+- patients/get_weekly_dosis/
 + Request (application/JSON)
 	+ Body
     ```
@@ -61,13 +61,13 @@ This method calculate the dose of the patients, but it doesn't save the patient 
 + Response (application/JSON)
 	```
 	{
-    "regressionDose": 5.742530690407449,
-    "networkDose": 5.193664073944092
+    	"regressionDose": 5.742530690407449,
+    	"networkDose": 5.193664073944092
 	}
 	```
 #### Fijar dosis [POST]
 This method set the dose of the patients and saves it to the database
-- https://peacth-ac-api.herokuapp.com/api/patients/set_dose/
+- patients/set_dose/
 + Request (application/JSON)
 	+ Body
     ```
@@ -93,13 +93,13 @@ This method set the dose of the patients and saves it to the database
 + Response (application/JSON)
 	```
 	{
-    "initialDose": 5.742530690407449
+    	"initialDose": 5.742530690407449
 	}
 	```
 
 #### Ver un paciente [GET]
 This method obtains the info of a pacient with a code
-- https://peacth-ac-api.herokuapp.com/api/patients/{code}
+- patients/{code}
 + Response
     ```
     {
@@ -122,7 +122,7 @@ This method obtains the info of a pacient with a code
     }
 
 #### Análisis Genético [GET] (Sujeto a Cambio)
-- https://peacth-ac-api.herokuapp.com/api/patients/T-001/genetic_analysis/
+- patients/T-001/genetic_analysis/
 + Response (application JSON)
 	```
 	{
@@ -139,7 +139,7 @@ This method obtains the info of a pacient with a code
 	```
 
 #### Perfil del paciente
-- https://peacth-ac-api.herokuapp.com/api/patients/{code}/patient_profile/
+- patients/{code}/patient_profile/
 + Response (application JSON)
 	```
 	{
@@ -199,7 +199,7 @@ This method obtains the info of a pacient with a code
 ### Registra visitas
 #### Ver todos los controles registrados [GET]
 This method allows us to see all the information about medical checks.
-- https://peacth-ac-api.herokuapp.com/api/clinical_control/
+- clinical_control/
 + Response (application JSON)
 	```
 	{ 
@@ -214,7 +214,7 @@ This method allows us to see all the information about medical checks.
 	```
 #### Registrar visita [POST]
 This method save the information about patient's medical checks 
-- https://peacth-ac-api.herokuapp.com/api/clinical_control/register_visit/register_visit/
+- clinical_control/register_visit/register_visit/
 + Request (application/JSON)
 	+ Body
 		```
@@ -236,7 +236,7 @@ This method save the information about patient's medical checks
 ### Actualizar parámetros del algoritmo
 #### Actualizar parámetros de forma manual [POST]
 This method allow us change the current parameters of the pharmacogenetics algorithm
-- https://peacth-ac-api.herokuapp.com/api/LogWTDparameters/set_parametres/set_parametres/
+- LogWTDparameters/set_parametres/set_parametres/
 + Request (application/JSON)
 	+ Body
 		```
@@ -262,7 +262,7 @@ This method allow us change the current parameters of the pharmacogenetics algor
 	```
 #### Obtener la última actualización de los parámetros [GET]
 This method allow us change the current parameters of the pharmacogenetics algorithm
-- https://peacth-ac-api.herokuapp.com/api/LogWTDparameters/get_last/get_last
+- LogWTDparameters/get_last/get_last
 + Response (application/JSON)
 	```
 	{
@@ -281,7 +281,7 @@ This method allow us change the current parameters of the pharmacogenetics algor
 	}
 	```
 ### Regresión lineal [GET]
-- https://peacth-ac-api.herokuapp.com/api/LogWTDparameters/multivariable_regression/
+- LogWTDparameters/multivariable_regression/
 + Response (application/JSON)
 	```
 	{
@@ -307,7 +307,7 @@ This method allow us change the current parameters of the pharmacogenetics algor
 		+ gen (string) : the gene for which information is required
 #### Información boxplot [GET]
 This method get information needed to plot boxplot
-- https://peacth-ac-api.herokuapp.com/api/distributions/boxplot/{gen}
+- distributions/boxplot/{gen}
 + Response (application/JSON)
 	```
 	[
@@ -345,7 +345,7 @@ This method get information needed to plot boxplot
 	```
 #### Información distribución [GET]
 This methos get information for distribution plots
-- https://peacth-ac-api.herokuapp.com/api/distributions/frequency/{gen}
+- distributions/frequency/{gen}
 + Response (application/JSON)
 	```
 	{
@@ -364,11 +364,21 @@ This methos get information for distribution plots
 ### Red neuronal
 #### Entrenar Red Neuronal [GET]
 This method trains the neural network
-- https://peacth-ac-api.herokuapp.com/api/LogWTDparameters/neural_network
+- LogWTDparameters/neural_network
 + Response (application/JSON)
 	```
 	{
-    "message": "Red neuronal actualizada."
+    	"message": "Red neuronal actualizada."
+	}
+	```
+#### Obtener último modelo de la Red Neuronal [GET]
+This method trains the neural network
+- LogWTDparameters/get_last_neural_network/
++ Response (application/JSON)
+	```
+	{
+    	"loss": 0.09884573519229889,
+    	"created_at": "27/10/2021 01:16:50"
 	}
 	```
 <div id='ayudas' />
