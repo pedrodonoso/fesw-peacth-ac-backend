@@ -517,9 +517,8 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
         print(type(last_nn["created_at"]))
 
         response = {
-            "accuracy" : last_nn["accuracy"],
-            "loss" : last_nn["loss"],
-            "updated_at" : last_nn["created_at"].strftime("%d/%m/%Y %H:%M:%S")
+            "loss" : str(round(last_nn["loss"]*100,2)) + "%",
+            "created_at" : last_nn["created_at"].strftime("%d/%m/%Y %H:%M:%S")
         }
         
         return Response(response,status=status.HTTP_200_OK)
