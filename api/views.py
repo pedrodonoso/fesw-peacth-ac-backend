@@ -176,6 +176,8 @@ class PatientModelViewSet(viewsets.ModelViewSet):
                     'initialDose' : pacient['initialDose']
                 }
                 return Response(response, status=status.HTTP_200_OK)
+            return Response(control_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['get'])
     def genetic_analysis(self, request, pk=None):
