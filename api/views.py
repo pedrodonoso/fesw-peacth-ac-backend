@@ -516,12 +516,18 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
         last_nn = db['api_network_models'].find_one({}, sort=[( '_id', pymongo.DESCENDING )])
 
-        print(type(last_nn["created_at"]))
-
         response = {
-            "loss" : str(round(last_nn["loss"]*100,2)) + "%",
-            "created_at" : last_nn["created_at"].strftime("%d/%m/%Y %H:%M:%S")
+            "loss" : "-",
+            "created_at" : "-"
         }
+
+        if last_nn != None:
+            response = {
+                "loss" : str(round(last_nn["loss"]*100,2)) + "%",
+                "created_at" : last_nn["created_at"].strftime("%d/%m/%Y %H:%M:%S")
+            }
+            
+            return Response(response,status=status.HTTP_200_OK)
         
         return Response(response,status=status.HTTP_200_OK)
 
