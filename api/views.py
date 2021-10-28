@@ -173,6 +173,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
                 control_serializer.save()
                 serializer.save()
                 response = {
+                    'message' : 'Dosis fijada correctamente',
                     'initialDose' : pacient['initialDose']
                 }
                 return Response(response, status=status.HTTP_200_OK)
