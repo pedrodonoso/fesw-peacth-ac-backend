@@ -369,6 +369,9 @@ This method trains the neural network
 + Response (application/JSON)
 	```
 	{
+		"is_updated" : True,
+		"loss": "9.88%",
+    	"updated_at_at": "27/10/2021 01:16:50"
     	"message": "Red neuronal actualizada."
 	}
 	```
