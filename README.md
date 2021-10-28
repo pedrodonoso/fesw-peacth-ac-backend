@@ -93,6 +93,7 @@ This method set the dose of the patients and saves it to the database
 + Response (application/JSON)
 	```
 	{
+		"message" : "Dosis fijada correctamente.",
     	"initialDose": 5.742530690407449
 	}
 	```
