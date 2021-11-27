@@ -22,3 +22,8 @@ class LogWTDparametersSerializer(serializers.ModelSerializer):
     class Meta:
         model = LogWTDparameters
         fields = '__all__'
+
+class ModelsResultsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ModelsResults
+        fields = '__all__'

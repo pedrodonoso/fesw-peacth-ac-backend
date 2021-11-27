@@ -102,14 +102,15 @@ CORS_ALLOW_HEADERS = [
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 # mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/test
-
+# mongodb+srv://kinewen:QMDIoiQ5BwS8GY5V@kinewen-cluster.skote.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
+# mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/peacth-ac?retryWrites=true&w=majority
 
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'peacth-ac',
         'CLIENT':{
-            'host': 'mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/peacth-ac?retryWrites=true&w=majority'
+            'host': 'mongodb+srv://kinewen:QMDIoiQ5BwS8GY5V@kinewen-cluster.skote.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
         }
     }
 }
