@@ -23,7 +23,7 @@ from pymongo import MongoClient
 from bson.binary import Binary
 import pickle
 
-client = MongoClient('mongodb+srv://kine001:6xG6jKScLdZYPGzh@cluster0.1l1z7.mongodb.net/peacth-ac?retryWrites=true&w=majority')
+client = MongoClient('mongodb+srv://kinewen:QMDIoiQ5BwS8GY5V@kinewen-cluster.skote.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
 db = client['peacth-ac']
 
 
@@ -152,19 +152,19 @@ class PatientModelViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def set_dose(self, request, pk=None):
 
-        pacient = request.data
+        patient = request.data
 
-        serializer = PatientSerializer(data=pacient)
+        serializer = PatientSerializer(data=patient)
 
         if serializer.is_valid():
             
 
             initial_control = {
-                    'patientCode' : pacient['code'],
-                    'controlDate' : pacient['initialDate'],
+                    'patientCode' : patient['code'],
+                    'controlDate' : patient['initialDate'],
                     'arrivalDose' : 0,
-                    'updatedDose': pacient['initialDose'],
-                    'arrivalINR': pacient['initialINR'],
+                    'updatedDose': patient['initialDose'],
+                    'arrivalINR': patient['initialINR'],
                     'inrInRange': False
                 }
 
@@ -174,11 +174,66 @@ class PatientModelViewSet(viewsets.ModelViewSet):
                 serializer.save()
                 response = {
                     'message' : 'Dosis fijada correctamente',
-                    'initialDose' : pacient['initialDose']
+                    'initialDose' : patient['initialDose']
                 }
                 return Response(response, status=status.HTTP_200_OK)
             return Response(control_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
+    def calculate_all_patients(self, request):
+        patients = Patient.objects.filter(weeklyDoseInRange__gt=0)
+        serializer = serializer = self.get_serializer(patients, many=True)
+
+        patients_json = serializer.data
+        #print(patients_json)
+        for p in patients_json:
+            p['genetics'] = json.loads(p['genetics'])
+            param = LogWTDparameters.objects.last()
+
+            network_model = db['api_network_models'].find_one({}, sort=[( '_id', pymongo.DESCENDING )])
+
+            network_weights = pickle.loads(network_model['weights'])
+            y_min_max = pickle.loads(network_model['y_min_max'])
+            X_min_max = pickle.loads(network_model['X_min_max'])
+
+            model = tf.keras.Sequential()
+            model.add(layers.Input(shape=(13,)))
+            model.add(layers.Dense(128, activation="tanh", name='hidden'))
+            model.add(layers.Dropout(0.2))
+            model.add(layers.Dense(64, activation="tanh", name='hidden2'))
+            model.add(layers.Dropout(0.2))
+            model.add(layers.Dense(32, activation="tanh", name='hidden3'))
+            model.add(layers.Dropout(0.2))
+            model.add(layers.Dense(1, activation="sigmoid", name='output'))
+
+            model.compile(loss=tf.keras.losses.mean_absolute_error, optimizer='Adam', metrics=['accuracy'])
+
+            model.set_weights(network_weights)
+
+            networkDose = predict_dose(model, p, X_min_max, y_min_max)
+
+            regressionDose = calculate_dosis(p, param)
+
+            result = {
+                    'code' : p['code'],
+                    'network_result' : regressionDose,
+                    'regression_result' : networkDose,
+                    'network_error' : abs(networkDose-p['weeklyDoseInRange'])/p['weeklyDoseInRange'],
+                    'regression_error': abs(regressionDose-p['weeklyDoseInRange'])/p['weeklyDoseInRange'],
+                    'final_dose' : p['weeklyDoseInRange'],
+                    'is_treatement_done' : True
+                }
+            
+            result_serializer = ModelsResultsSerializer(data=result)
+
+            if result_serializer.is_valid():
+                result_serializer.save()
+            
+
+            
+        
+        return Response({'message' : 'All patients calculated'}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def genetic_analysis(self, request, pk=None):
@@ -531,6 +586,10 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
             return Response(response,status=status.HTTP_200_OK)
         
         return Response(response,status=status.HTTP_200_OK)
+
+class ModelsResultsModelViewSet(viewsets.ModelViewSet):
+    serializer_class = ModelsResultsSerializer
+    queryset = ModelsResults.objects.all()
 
 class BoxplotVizualitation(APIView):
 

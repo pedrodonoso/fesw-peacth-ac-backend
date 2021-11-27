@@ -56,3 +56,13 @@ class LogWTDparameters(models.Model):
     p_VKORC1_GA = models.FloatField(default=0)
     p_VKORC1_AA = models.FloatField(default=0)
     r_squared = models.FloatField(default=0)
+
+class ModelsResults(models.Model):
+    _id = models.ObjectIdField()
+    code = models.CharField(unique=True, max_length=5)
+    network_result = models.FloatField(default=0)
+    regression_result = models.FloatField(default=0)
+    network_error = models.FloatField(default=0)
+    regression_error = models.FloatField(default=0)
+    final_dose = models.FloatField(default=0)
+    is_treatement_done = models.BooleanField(default=False)
