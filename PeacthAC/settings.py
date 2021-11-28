@@ -59,7 +59,7 @@ ROOT_URLCONF = 'PeacthAC.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -175,3 +175,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #import django_heroku
 #django_heroku.settings(locals(), databases=False)
+
+EMAIL_HOST = 'smtp.googlemail.com'
+
+EMAIL_PORT = 587
+
+EMAIL_HOST_USER = 'kinewenfesw@gmail.com' 
+
+EMAIL_HOST_PASSWORD = 'FeriaDeSoftware2021!'
+
+EMAIL_USE_TLS = True 
+

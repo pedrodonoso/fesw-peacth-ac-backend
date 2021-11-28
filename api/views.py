@@ -22,6 +22,9 @@ import pymongo
 from pymongo import MongoClient
 from bson.binary import Binary
 import pickle
+from django.template.loader import get_template
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings 
 
 client = MongoClient('mongodb+srv://kinewen:QMDIoiQ5BwS8GY5V@kinewen-cluster.skote.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
 db = client['peacth-ac']
@@ -660,3 +663,28 @@ class FrequencyVizualitation(APIView):
                 }
 
         return Response(response, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def send_email(request):
+    destino = request.data['email']
+    context = {'mail': destino}
+    template = get_template('email.html')
+    content = template.render(context)
+
+    email = EmailMultiAlternatives(
+        'Peacth-AC',
+        'Kiñewen',
+        settings.EMAIL_HOST_USER,
+        destino
+    )
+
+    email.attach_alternative(content,'text/html')
+
+    email.send()
+
+    response = {
+                'response' : 'correo enviado con exito'
+                }
+        
+    return Response(response, status=status.HTTP_200_OK)
