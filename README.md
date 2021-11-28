@@ -31,7 +31,7 @@ python3 manage.py migrate
 # Documentación API
 
 ### API root
-- http://3.143.234.136:8000/api/
+- https://peacth-ac-backend.rj.r.appspot.com/api/
 ### ESTIMACIÓN DE DOSIS
 #### Calcular dosis semanal [POST]
 This method calculate the dose of the patients, but it doesn't save the patient in the database
@@ -302,7 +302,44 @@ This method allow us change the current parameters of the pharmacogenetics algor
 		}
 	}
 	```
-
+### Comparación de modelos
+- models_analysis/
++ Response (application/JSON)
+	```
+	[
+		{
+			"_id": "61a2c16a323df109b65afde1",
+			"code": "T-001",
+			"network_result": 9.929399471052776,
+			"regression_result": 9.107564926147461,
+			"network_error": 0.08924350738525391,
+			"regression_error": 0.007060052894722446,
+			"final_dose": 10.0,
+			"is_treatement_done": true
+		},
+		{
+			"_id": "61a2c16b323df109b65afde2",
+			"code": "T-002",
+			"network_result": 11.289803802260646,
+			"regression_result": 8.968988418579102,
+			"network_error": 0.5017228656344943,
+			"regression_error": 0.3727886776521863,
+			"final_dose": 18.0,
+			"is_treatement_done": true
+		},
+		{
+			"_id": "61a2c16c323df109b65afde3",
+			"code": "T-003",
+			"network_result": 6.81141580885468,
+			"regression_result": 11.417252540588379,
+			"network_error": 0.1417252540588379,
+			"regression_error": 0.31885841911453194,
+			"final_dose": 10.0,
+			"is_treatement_done": true
+		},
+		...
+	]
+	```
 ### Análisis comparativo de la dosis calculada entre genotipos ingresados
 + Parameters
 		+ gen (string) : the gene for which information is required
