@@ -215,7 +215,7 @@ This method allows us to see all the information about medical checks.
 	```
 #### Registrar visita [POST]
 This method save the information about patient's medical checks 
-- clinical_control/register_visit/register_visit/
+- clinical_control/register_visit/
 + Request (application/JSON)
 	+ Body
 		```
