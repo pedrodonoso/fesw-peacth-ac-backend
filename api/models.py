@@ -66,3 +66,19 @@ class ModelsResults(models.Model):
     regression_error = models.FloatField(default=0)
     final_dose = models.FloatField(default=0)
     is_treatement_done = models.BooleanField(default=False)
+
+class MedicalStaff(models.Model):
+    _id = models.ObjectIdField()
+    email = models.CharField(unique=True, max_length=100)
+    password = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    registry_number = models.CharField(unique=True, max_length=100)
+    rut = models.CharField(unique=True, max_length=100)
+
+class LaboratoryWorker(models.Model):
+    _id = models.ObjectIdField()
+    email = models.CharField(unique=True, max_length=100)
+    password = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)

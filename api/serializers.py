@@ -28,3 +28,15 @@ class ModelsResultsSerializer(serializers.ModelSerializer):
         model = ModelsResults
         #fields = '__all__'
         exclude = ['_id']
+
+class MedicalStaffSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MedicalStaff
+        fields = '__all__'
+        extra_kwargs = {'password' : {'write_only': True}}
+
+class LaboratoryWorkerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LaboratoryWorker
+        fields = '__all__'
+        

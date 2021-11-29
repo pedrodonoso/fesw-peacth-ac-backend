@@ -2,6 +2,7 @@ from typing import Collection
 from PeacthAC.settings import DATABASES
 from rest_framework import response
 from rest_framework.serializers import Serializer
+from rest_framework.exceptions import AuthenticationFailed
 from api import serializers
 from rest_framework.decorators import api_view,schema
 from django.shortcuts import render
@@ -23,10 +24,11 @@ from pymongo import MongoClient
 from bson.binary import Binary
 import pickle
 from django.template.loader import get_template
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives, message
 from django.conf import settings 
 from email.mime.image import MIMEImage
 import os
+import jwt
 
 client = MongoClient('mongodb+srv://kinewen:QMDIoiQ5BwS8GY5V@kinewen-cluster.skote.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
 db = client['peacth-ac']
@@ -704,3 +706,145 @@ def send_email(request):
                 }
         
     return Response(response, status=status.HTTP_200_OK)
+
+class MedicalStaffModelViewSet(viewsets.ModelViewSet):
+    serializer_class = MedicalStaffSerializer
+    queryset = MedicalStaff.objects.all()       
+
+    @action(detail=False, methods=['post'])
+    def register(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'])
+    def login(self, request):
+        email = request.data['email']
+        password = request.data['password']
+
+        staff = MedicalStaff.objects.filter(email=email).first()
+
+        if staff is None:
+            raise AuthenticationFailed("User not Found")
+
+        if password != staff.password:
+            raise AuthenticationFailed("Incorrect Password")
+        
+
+        payload = {
+            "rut" : staff.rut,
+            "name" : staff.name,
+            "last_name" : staff.last_name,
+            "type" : "medical_staff"
+        }
+
+        token = jwt.encode(payload, "secret", algorithm='HS256').decode('utf-8')
+
+        response = Response()
+        
+        response.set_cookie(key='jwt', value=token, httponly=True)
+        response.data = {
+            'jwt': token
+        }
+
+        return response
+
+    @action(detail=False, methods=['post'])
+    def logout(self, request):
+
+        response = Response()
+        response.delete_cookie('jwt')
+        response.data = {
+            'message' : 'Logout success'
+        }
+
+        return response
+
+    @action(detail=False, methods=['get'])
+    def get_session(self, request, pk=None):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+        
+        payload = jwt.decode(token, 'secret', algorithm=['HS26'])
+        
+
+        med = MedicalStaff.objects.filter(rut=payload['rut']).first()
+        serializer = self.serializer_class(med)
+
+        return Response(serializer.data)
+
+class LaboratoryWorkerModelViewSet(viewsets.ModelViewSet):
+    serializer_class = LaboratoryWorkerSerializer
+    queryset = LaboratoryWorker.objects.all()       
+
+    @action(detail=False, methods=['post'])
+    def register(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'])
+    def login(self, request):
+        email = request.data['email']
+        password = request.data['password']
+
+        staff = LaboratoryWorker.objects.filter(email=email).first()
+
+        if staff is None:
+            raise AuthenticationFailed("User not Found")
+
+        if password != staff.password:
+            raise AuthenticationFailed("Incorrect Password")
+        
+
+        payload = {
+            "email" : staff.email,
+            "name" : staff.name,
+            "last_name" : staff.last_name,
+            "type" : "laboratory_worker"
+        }
+
+        token = jwt.encode(payload, "secret", algorithm='HS256').decode('utf-8')
+
+        response = Response()
+        
+        response.set_cookie(key='jwt', value=token, httponly=True)
+        response.data = {
+            'jwt': token
+        }
+
+        return response
+
+    @action(detail=False, methods=['post'])
+    def logout(self, request):
+
+        response = Response()
+        response.delete_cookie('jwt')
+        response.data = {
+            'message' : 'Logout success'
+        }
+
+        return response
+
+    @action(detail=False, methods=['get'])
+    def get_session(self, request, pk=None):
+        token = request.COOKIES.get('jwt')
+
+        if not token:
+            raise AuthenticationFailed('Unauthenticated')
+        
+        payload = jwt.decode(token, 'secret', algorithm=['HS26'])
+        
+
+        med = LaboratoryWorker.objects.filter(email=payload['email']).first()
+        serializer = self.serializer_class(med)
+
+        return Response(serializer.data)
