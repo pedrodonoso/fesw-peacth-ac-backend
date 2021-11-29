@@ -666,7 +666,6 @@ class FrequencyVizualitation(APIView):
 
         return Response(response, status=status.HTTP_200_OK)
 
-
 @api_view(['POST'])
 def send_email(request):
 
@@ -689,11 +688,14 @@ def send_email(request):
 
     msg.attach_alternative(content,'text/html')
 
-    fp = open('templates/img/logo-color.png', 'rb')
-    image = MIMEImage(fp.read())
-    fp.close()
-    image.add_header('Content-ID', '<img1>')
-    msg.attach(image)
+    images = ['logo-color.png', 'facebook.png','instagram.png']
+
+    for i,img in enumerate(images,start=1):
+        fp = open('templates/img/'+img, 'rb')
+        image = MIMEImage(fp.read())
+        fp.close()
+        image.add_header('Content-ID', '<img'+str(i)+'>')
+        msg.attach(image)
 
     msg.send()
 
