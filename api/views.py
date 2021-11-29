@@ -92,7 +92,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
             #serializer.save()
 
             #patient = Patient.objects.get(code=request_data['code'])
-            print(request_data)
+            #print(request_data)
 
             param = LogWTDparameters.objects.last()
 
@@ -337,7 +337,7 @@ class ClinicalControlViewSet(viewsets.ModelViewSet):
 
         serializer = ClinicalControlSerializer(data=request_data)
         patient = Patient.objects.get(code=request_data['patientCode'])
-        print(patient.code)
+        #print(patient.code)
         
 
         if serializer.is_valid():
@@ -346,8 +346,8 @@ class ClinicalControlViewSet(viewsets.ModelViewSet):
             controlDate = date(int(newDate[0]),int(newDate[1]),int(newDate[2]))
             delta = controlDate - initialDate
             patient.totalDays = delta.days
-            print(delta.days)
-            print(patient.totalDays)
+            #print(delta.days)
+            #print(patient.totalDays)
             if request_data['inrInRange']:
                 patient.weeklyDoseInRange = request_data['arrivalDose']
             patient.save()
@@ -388,7 +388,7 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
         last_parameters = LogWTDparameters.objects.last()
         json = LogWTDparametersSerializer(last_parameters)
-        print(json.data)
+        #print(json.data)
 
 
         return Response(json.data, status=status.HTTP_200_OK)
@@ -398,12 +398,12 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
         patients = Patient.objects.filter(weeklyDoseInRange__gt=0)
 
         df = patients_dataframe(patients)
-        print(df.head())
+        #print(df.head())
 
         lm = sfm.OLS.from_formula(formula="logdose~C(sex)+age+inr+imc+C(cyp2c92)+C(cyp2c93)+C(vkorc1)", data=df).fit()
 
         #print(lm.summary())
-        print(lm.params)
+        #print(lm.params)
         params = lm.params
         parameters = {
                     "p_0": params[0],
@@ -491,7 +491,7 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
         y_min_max = [y_min, y_max]
         X_min_max = [X_min, X_max]
 
-        print(X_min_max)
+        #print(X_min_max)
 
         y_norm = minmax_norm(y, y_min, y_max)
         X_norm = minmax_norm(X, X_min, X_max)
@@ -531,7 +531,7 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
         #w = model.predict(a)
 
         network_weights = model.get_weights()
-        print(history.history['val_accuracy'][-1])
+        #print(history.history['val_accuracy'][-1])
 
         weights_bin = Binary(pickle.dumps(network_weights, protocol=2), subtype=128 )
         y_min_max_bin = Binary(pickle.dumps(y_min_max, protocol=2), subtype=128 )
@@ -552,7 +552,7 @@ class LogWTDparametersViewSet(viewsets.ModelViewSet):
         
         network_id = network_collection.insert_one(doc).inserted_id
 
-        print("Document with " + str(network_id) + " saved successfully.")
+        #print("Document with " + str(network_id) + " saved successfully.")
 
         #arrx = pickle.loads(binary)
 
@@ -613,7 +613,7 @@ class BoxplotVizualitation(APIView):
 
         y = gens[x].unique()
 
-        print(y)
+        #print(y)
 
         l= []
 
@@ -635,7 +635,7 @@ class BoxplotVizualitation(APIView):
 
             l.append(aux)
 
-            print(mn,q1,q2,q3,mx)
+            #print(mn,q1,q2,q3,mx)
 
         response = l
 
@@ -645,7 +645,7 @@ class FrequencyVizualitation(APIView):
     
     def get(self,request, **kwargs):
 
-        print(kwargs['variable'])
+        #print(kwargs['variable'])
 
         #Petición
         x = kwargs['variable'] # 'CYP2C9_3'
@@ -657,7 +657,7 @@ class FrequencyVizualitation(APIView):
 
         freq = gens[x].value_counts()
 
-        print(freq)
+        #print(freq)
 
         response = {
                         'labels' : freq.index.tolist(),
@@ -671,10 +671,10 @@ class FrequencyVizualitation(APIView):
 def send_email(request):
 
     emailDestino = request.data['email']
-    patientName = 'Mauricio'
+    patientName = request.data['patient']
     medicName = 'Fulano'
     date = get_date()
-    totalDosis = '5'
+    totalDosis = request.data['totalDosis']
 
     context = {'patientName': patientName, 'medicName' : medicName, 'date': date, 'totalDosis': totalDosis}
     template = get_template('email.html')
@@ -689,7 +689,10 @@ def send_email(request):
 
     msg.attach_alternative(content,'text/html')
 
-    image = MIMEImage(open('templates/img/logo-color.png', 'rb').read())
+    fp = open('templates/img/logo-color.png', 'rb')
+    image = MIMEImage(fp.read())
+    fp.close()
+    image.add_header('Content-ID', '<img1>')
     msg.attach(image)
 
     msg.send()
