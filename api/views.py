@@ -25,6 +25,8 @@ import pickle
 from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings 
+from email.mime.image import MIMEImage
+import os
 
 client = MongoClient('mongodb+srv://kinewen:QMDIoiQ5BwS8GY5V@kinewen-cluster.skote.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
 db = client['peacth-ac']
@@ -667,21 +669,30 @@ class FrequencyVizualitation(APIView):
 
 @api_view(['POST'])
 def send_email(request):
-    destino = request.data['email']
-    context = {'mail': destino}
+
+    emailDestino = request.data['email']
+    patientName = 'Mauricio'
+    medicName = 'Fulano'
+    date = get_date()
+    totalDosis = '5'
+
+    context = {'patientName': patientName, 'medicName' : medicName, 'date': date, 'totalDosis': totalDosis}
     template = get_template('email.html')
     content = template.render(context)
 
-    email = EmailMultiAlternatives(
+    msg = EmailMultiAlternatives(
         'Peacth-AC',
         'Kiñewen',
         settings.EMAIL_HOST_USER,
-        destino
+        [emailDestino]
     )
 
-    email.attach_alternative(content,'text/html')
+    msg.attach_alternative(content,'text/html')
 
-    email.send()
+    image = MIMEImage(open('templates/img/logo-color.png', 'rb').read())
+    msg.attach(image)
+
+    msg.send()
 
     response = {
                 'response' : 'correo enviado con exito'

@@ -26,6 +26,7 @@ from tensorflow.keras.layers import Dense, Conv2D, MaxPool2D, Dropout, Input, co
 from keras.utils.vis_utils import plot_model
 from keras.callbacks import ModelCheckpoint
 from keras import Model
+import datetime
 
 
 #network_weights = []
@@ -209,3 +210,13 @@ def predict_dose(model, patient, X_min_max, y_min_max):
     print(networkDose)
 
     return networkDose[0][0]
+
+def get_date():
+    mes = {'1':'enero', '2':'febrero', '3':'marzo', '4':'abril', '5': 'mayo', '6':'junio',
+       '7':'julio', '8':'agosto', '9':'septiembre', '10':'octubre', '11': 'noviembre', '12':'diciembre'}
+           
+    x = datetime.datetime.now()
+
+    l = x.strftime("%x").split("/")
+
+    return "{} de {}".format(l[1], mes[l[0]])
