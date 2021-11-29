@@ -10,7 +10,7 @@
 
 Instalar requerimientos
 ```
-pip install -r requeriments.txt
+pip install -r requirements.txt
 ```
 
 Se requiere tener una base de datos en mongoDB
@@ -422,6 +422,27 @@ This method trains the neural network
     	"created_at": "27/10/2021 01:16:50"
 	}
 	```
+<div id='ayudas' />
+
+#### Enviar email  [POST]
+This method send an email to some addressee
+- api/send_email/
++ Request (application/JSON)
+	+ Body
+    ```
+    {
+    	"email": "example@example.com",
+		"totalDosis" : 1,
+		"patient" : "T-001"            
+    }
+	```
++ Response (application/JSON)
+	```
+	{
+    	'response' : 'correo enviado con exito'
+    }
+	```
+
 <div id='ayudas' />
 
 # Ayudas
