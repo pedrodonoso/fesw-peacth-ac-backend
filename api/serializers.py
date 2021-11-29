@@ -26,4 +26,5 @@ class LogWTDparametersSerializer(serializers.ModelSerializer):
 class ModelsResultsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModelsResults
-        fields = '__all__'
+        #fields = '__all__'
+        exclude = ['_id']
