@@ -671,10 +671,10 @@ class FrequencyVizualitation(APIView):
 def send_email(request):
 
     emailDestino = request.data['email']
-    patientName = 'Mauricio'
+    patientName = request.data['patient']
     medicName = 'Fulano'
     date = get_date()
-    totalDosis = '5'
+    totalDosis = request.data['totalDosis']
 
     context = {'patientName': patientName, 'medicName' : medicName, 'date': date, 'totalDosis': totalDosis}
     template = get_template('email.html')
@@ -689,7 +689,10 @@ def send_email(request):
 
     msg.attach_alternative(content,'text/html')
 
-    image = MIMEImage(open('templates/img/logo-color.png', 'rb').read())
+    fp = open('templates/img/logo-color.png', 'rb')
+    image = MIMEImage(fp.read())
+    fp.close()
+    image.add_header('Content-ID', '<img1>')
     msg.attach(image)
 
     msg.send()
