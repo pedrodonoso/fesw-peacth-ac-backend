@@ -18,7 +18,7 @@
 # [START gaestd_py_django_app_yaml]
 runtime: python38
 instance_class: F4
-#entrypoint: gunicorn --preload -b :$PORT -w 3 main:app
+entrypoint: gunicorn --preload -b :$PORT -w 4 main:app
 
 handlers:
 # This configures Google App Engine to serve the files in the app's static
