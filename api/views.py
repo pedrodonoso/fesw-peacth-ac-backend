@@ -328,7 +328,7 @@ class ClinicalControlViewSet(viewsets.ModelViewSet):
     serializer_class = ClinicalControlSerializer
     queryset = ClinicalControl.objects.all()
 
-    @action(detail=True, methods=['post'])
+    @action(detail=False, methods=['post'])
     def register_visit(self, request, pk=None):
 
         self.serializer_class = ClinicalControlSerializer
@@ -343,7 +343,7 @@ class ClinicalControlViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             initialDate = patient.initialDate
             newDate = request_data['controlDate'].split('-')
-            controlDate = date(int(newDate[0]),int(newDate[1]),int(newDate[2]))
+            controlDate = datetime.date(int(newDate[0]),int(newDate[1]),int(newDate[2]))
             delta = controlDate - initialDate
             patient.totalDays = delta.days
             #print(delta.days)
