@@ -35,26 +35,26 @@ import datetime
 
 def calculate_dosis(data,params):
     age = data['age']
-    print(age)
+    #print(age)
     men = 1 if data['sex'] == 'M' else 0
-    print(men)
+    #print(men)
     initialINR = data['initialINR']
-    print(initialINR)
+    #print(initialINR)
     imc = data['imc']
-    print(imc)
+    #print(imc)
     CYP2C9_2_12 = 1 if data['genetics']['CYP2C9_2'] == '*1/*2' else 0
-    print(CYP2C9_2_12)
+    #print(CYP2C9_2_12)
     CYP2C9_3_13 = 1 if data['genetics']['CYP2C9_3'] == '*1/*3' else 0
-    print(CYP2C9_3_13)
+    #print(CYP2C9_3_13)
     CYP2C9_3_33 = 1 if data['genetics']['CYP2C9_3'] == '*3/*3' else 0
-    print(CYP2C9_3_33)
+    #print(CYP2C9_3_33)
     VKORC1_GA = 1 if data['genetics']['VKORC1'] == 'G/A' else 0
-    print(VKORC1_GA)
+    #print(VKORC1_GA)
     VKORC1_AA = 1 if data['genetics']['VKORC1'] == 'A/A' else 0
-    print(VKORC1_AA)
+    #print(VKORC1_AA)
 
     logWTD = params.p_0 + (params.p_men * men) + (age * params.p_age) + (initialINR * params.p_initialINR) + (imc * params.p_imc) + (CYP2C9_2_12 * params.p_CYP2C9_12) + (CYP2C9_3_13 * params.p_CYP2C9_13) + (CYP2C9_3_33 * params.p_CYP2C9_33) + (VKORC1_GA * params.p_VKORC1_GA) + (VKORC1_AA * params.p_VKORC1_AA)
-    print(logWTD)
+    #print(logWTD)
         
     return np.exp(logWTD)
 
@@ -193,21 +193,21 @@ def predict_dose(model, patient, X_min_max, y_min_max):
 
     X_norm = minmax_norm(X, X_min_max[0], X_min_max[1])
 
-    print(type(X_norm))
+    #print(type(X_norm))
 
     X_norm = X_norm.fillna(0)
     X_norm = X_norm.astype('float64')
     
 
-    print(X_norm)
+    #print(X_norm)
 
     networkDoseNorm = model.predict(X_norm)
 
-    print(networkDoseNorm)
+    #print(networkDoseNorm)
 
     networkDose = r_minmax_norm(networkDoseNorm, y_min_max[0], y_min_max[1])
 
-    print(networkDose)
+    #print(networkDose)
 
     return networkDose[0][0]
 
