@@ -361,6 +361,15 @@ class ClinicalControlViewSet(viewsets.ModelViewSet):
         
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['get'])
+    def get_last(self, request, pk=None):
+
+        last = ClinicalControl.objects.filter(patientCode=pk).order_by('-_id')[0]
+
+        serializer = self.serializer_class(last)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class LogWTDparametersViewSet(viewsets.ModelViewSet):
 
