@@ -456,7 +456,104 @@ This method send an email to some addressee
     	'response' : 'correo enviado con exito'
     }
 	```
-
+### Registro
+#### Médicos [POST]
+- api/medical/register/
++ Request (application/JSON)
+	+ Body
+    ```
+    {
+		"email": "test@test.com",
+		"password": "test",
+		"name": "Cosme",
+		"last_name": "Fulanito",
+		"registry_number": "1234",
+		"rut": "12345678-9"
+	}
+	```
++ Response (application/JSON)
+	```
+	{
+		"_id": "61a6a1c0b9ba261409f0f662",
+		"email": "test@test.com",
+		"name": "Cosme",
+		"last_name": "Fulanito",
+		"registry_number": "123456",
+		"rut": "12345678-9"
+	}
+	```
+#### Laboratoristas [POST]
+- api/laboratory_worker/register/
++ Request (application/JSON)
+	+ Body
+    ```
+    {
+		"email": "test@test.com",
+		"password": "test",
+		"name": "Cosme",
+		"last_name": "Fulanito"
+	}
+	```
++ Response (application/JSON)
+	```
+	{
+		"_id": "61a6a261b9ba261409f0f663",
+		"email": "test@test.com",
+		"password": "test",
+		"name": "Cosme",
+		"last_name": "Fulanito"
+	}
+	```
+### Login
+#### Médicos [POST]
+- api/medical/login/
++ Request (application/JSON)
+	+ Body
+    ```
+    {
+		"email": "test@test.com",
+		"password": "test"
+	}
+	```
++ Response (application/JSON)
+	```
+	{
+		"jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.					eyJydXQiOiIxMjM0NTY3OC05IiwibmFtZSI6IkNvc21lIiwibGFzdF9uYW1lIjoiRnVsYW5pdG8iLCJ0eXBlIjoibWVkaWNhbF9zdGFmZiJ9.vK2ikOEAIBVr3y2ufI4cTXPTF3H3BYGkWlTnHJAWkmY"
+	}
+	```
+#### Laboratoristas [POST]
+- api/laboratory_worker/login/
++ Request (application/JSON)
+	+ Body
+    ```
+    {
+		"email": "test@test.com",
+		"password": "test"
+	}
+	```
++ Response (application/JSON)
+	```
+	{
+		"jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.					eyJydXQiOiIxMjM0NTY3OC05IiwibmFtZSI6IkNvc21lIiwibGFzdF9uYW1lIjoiRnVsYW5pdG8iLCJ0eXBlIjoibWVkaWNhbF9zdGFmZiJ9.vK2ikOEAIBVr3y2ufI4cTXPTF3H3BYGkWlTnHJAWkmY"
+	}
+	```
+### Logout
+#### Médicos [POST]
+- api/medical/logout/
++ Response (application/JSON)
+	```
+	{
+		"message": "Logout success"
+	}
+	```
+#### Laboratoristas [POST]
+- api/laboratory_worker/logout/
++ Response (application/JSON)
+	```
+	{
+		"message": "Logout success"
+	}
+	```
 <div id='ayudas' />
 
 # Ayudas
