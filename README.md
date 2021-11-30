@@ -234,6 +234,20 @@ This method save the information about patient's medical checks
 		"message": "Saved Succesfully"
 	}
 	```
+#### Obtener última visita de un paciente [GET]
+- clinical_control/{patientCode}/get_last/
++ Response (application/JSON)
+	```
+	{
+		"_id": "61a4492543dcb6d6e9221657",
+		"patientCode": "Q-001",
+		"controlDate": "2010-03-28",
+		"arrivalDose": 11.0,
+		"updatedDose": 12.0,
+		"arrivalINR": 2.5,
+		"inrInRange": false
+	}
+	```
 ### Actualizar parámetros del algoritmo
 #### Actualizar parámetros de forma manual [POST]
 This method allow us change the current parameters of the pharmacogenetics algorithm
