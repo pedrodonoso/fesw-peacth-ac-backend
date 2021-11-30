@@ -302,6 +302,7 @@ class PatientModelViewSet(viewsets.ModelViewSet):
             doseValues = []
 
             for v in visits:
+                '''
                 if first:
                     dates.append(v.controlDate.strftime("%d/%m/%Y"))
                     inrValues.append(v.arrivalINR)
@@ -311,7 +312,10 @@ class PatientModelViewSet(viewsets.ModelViewSet):
                     dates.append(v.controlDate.strftime("%d/%m/%Y"))
                     inrValues.append(v.arrivalINR)
                     doseValues.append(v.arrivalDose)
-
+                '''
+                dates.append(v.controlDate.strftime("%d/%m/%Y"))
+                inrValues.append(v.arrivalINR)
+                doseValues.append(v.updatedDose)
             historicINR = {
                 "dates" : dates,
                 "inrValues" : inrValues,
