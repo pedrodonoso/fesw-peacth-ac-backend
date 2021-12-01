@@ -686,7 +686,7 @@ def send_email(request):
 
     emailDestino = request.data['email']
     patientName = request.data['patient']
-    medicName = 'Fulano'
+    medicName = request.data['name']
     date = get_date()
     totalDosis = request.data['totalDosis']
 
