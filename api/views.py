@@ -776,9 +776,9 @@ class MedicalStaffModelViewSet(viewsets.ModelViewSet):
 
         return response
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['post'])
     def get_session(self, request, pk=None):
-        token = request.COOKIES.get('jwt')
+        token = request.data['jwt']
 
         if not token:
             raise AuthenticationFailed('Unauthenticated')
